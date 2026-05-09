@@ -1,0 +1,142 @@
+@using System.Security.Claims
+@inject Bayti.Data.ApplicationDbContext DbContext
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] – Bayti</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="stylesheet" href="~/css/variables.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body>
+<div class="bayti-app">
+
+    <!-- ═══════════════ SIDEBAR ═══════════════ -->
+    <aside class="sidebar">
+
+        <!-- Brand -->
+        <div class="sb-brand">
+            <div class="sb-logo-icon">
+                <i class="fa-solid fa-house"></i>
+            </div>
+            <div>
+                <div class="sb-name">Bayti</div>
+                <div class="sb-tagline">COLOC' ZEN</div>
+            </div>
+        </div>
+
+        <!-- Mini Stats -->
+        @{
+            var uid = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            int pts = 0;
+            string joinCode = User.FindFirstValue("JoinCode") ?? "---";
+            if (!string.IsNullOrEmpty(uid)) {
+                var u = DbContext.Users.Find(int.Parse(uid));
+                if (u != null) pts = u.Points;
+            }
+        }
+        <div class="sb-stats">
+            <div class="sb-stat-card">
+                <span class="sb-stat-label">POINTS</span>
+                <span class="sb-stat-val"><i class="fa-solid fa-star" style="color:var(--coral);font-size:12px;"></i> @pts</span>
+            </div>
+            <div class="sb-stat-card">
+                <span class="sb-stat-label">ACCÈS</span>
+                <span class="sb-stat-val code">@joinCode</span>
+            </div>
+        </div>
+
+        <!-- Navigation -->
+        <nav class="sb-nav">
+
+            <div class="sb-section-label">Principal</div>
+            <a class="sb-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Home" ? "active" : "")"
+               asp-controller="Home" asp-action="Index">
+                <i class="fa-regular fa-table-columns sb-link-icon"></i>
+                <span>Tableau de bord</span>
+            </a>
+            <a class="sb-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Tasks" ? "active" : "")"
+               asp-controller="Tasks" asp-action="Index">
+                <i class="fa-regular fa-square-check sb-link-icon"></i>
+                <span>Mes tâches</span>
+            </a>
+            <a class="sb-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Planning" ? "active" : "")"
+               asp-controller="Tasks" asp-action="Index">
+                <i class="fa-regular fa-calendar sb-link-icon"></i>
+                <span>Planning</span>
+            </a>
+            @{
+                int unread = 0;
+                if (!string.IsNullOrEmpty(uid))
+                    unread = DbContext.Notifications.Count(n => n.UserId == int.Parse(uid) && !n.IsRead);
+            }
+            <a class="sb-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Notifications" ? "active" : "")"
+               asp-controller="Notifications" asp-action="Index">
+                <i class="fa-regular fa-bell sb-link-icon"></i>
+                <span>Notifications</span>
+                @if (unread > 0) {
+                    <span class="sb-badge">@unread</span>
+                }
+            </a>
+
+            <div class="sb-section-label" style="margin-top:8px;">Colocation</div>
+            <a class="sb-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Colocation" ? "active" : "")"
+               asp-controller="Colocation" asp-action="Index">
+                <i class="fa-solid fa-user-group sb-link-icon"></i>
+                <span>Membres</span>
+            </a>
+            <a class="sb-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Categories" ? "active" : "")"
+               asp-controller="Categories" asp-action="Index">
+                <i class="fa-solid fa-tag sb-link-icon"></i>
+                <span>Catégories</span>
+            </a>
+            <a class="sb-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "TaskTemplates" ? "active" : "")"
+               asp-controller="TaskTemplates" asp-action="Index">
+                <i class="fa-solid fa-list-check sb-link-icon"></i>
+                <span>Règles tâches</span>
+            </a>
+            <a class="sb-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Rewards" ? "active" : "")"
+               asp-controller="Rewards" asp-action="Index">
+                <i class="fa-solid fa-bag-shopping sb-link-icon"></i>
+                <span>Boutique</span>
+            </a>
+
+        </nav>
+
+        <!-- User Footer -->
+        <div class="sb-footer">
+            @{
+                var av = User.FindFirstValue("AvatarUrl") ?? "/images/avatars/avatar1.png";
+                var avSrc = av.StartsWith("http") ? av : Url.Content(av);
+            }
+            <a asp-controller="Account" asp-action="Profile" class="sb-user-card">
+                <img src="@avSrc" class="sb-user-av" alt="avatar" />
+                <div class="sb-user-info">
+                    <span class="sb-user-name">@(User.Identity?.Name?.Split('@')[0] ?? "Utilisateur")</span>
+                    <span class="sb-user-role">Membre de la tribu</span>
+                </div>
+            </a>
+            <a asp-controller="Account" asp-action="Logout" class="sb-logout">
+                <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                Déconnexion
+            </a>
+        </div>
+
+    </aside>
+
+    <!-- ═══════════════ MAIN ═══════════════ -->
+    <main class="bayti-main">
+        @RenderBody()
+    </main>
+
+</div>
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+@await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

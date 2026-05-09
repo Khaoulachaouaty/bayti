@@ -1,0 +1,160 @@
+@model Bayti.Models.TaskTemplate
+@{
+    ViewData["Title"] = "Nouvelle Règle";
+}
+
+<div class="premium-form-card" style="max-width: 860px;">
+    <a asp-action="Index" class="btn-back-minimal">
+        <i class="fa-solid fa-arrow-left"></i>
+    </a>
+    
+    <div class="mb-10">
+        <h1 class="form-title-premium">Nouvelle mission ✨</h1>
+        <p class="form-subtitle-premium">Créez une mission récurrente pour automatiser votre quotidien.</p>
+    </div>
+
+    <form asp-action="Create" method="post">
+        <div asp-validation-summary="All" class="text-danger mb-4" style="font-size: 11px;"></div>
+        
+        <div class="grid-form-layout">
+            <!-- Left Column -->
+            <div class="form-col">
+                <div class="form-group-premium">
+                    <label asp-for="Title" class="form-label-premium">Titre</label>
+                    <input asp-for="Title" class="input-premium" placeholder="Ex: Faire la vaisselle" required />
+                    <span asp-validation-for="Title" class="text-danger" style="font-size: 11px;"></span>
+                </div>
+
+                <div class="form-group-premium">
+                    <label asp-for="Description" class="form-label-premium">Description</label>
+                    <textarea asp-for="Description" class="input-premium" rows="3" placeholder="Détails importants..."></textarea>
+                </div>
+
+                <div class="flex gap-4">
+                    <div class="form-group-premium flex-1">
+                        <label asp-for="CategoryId" class="form-label-premium">Catégorie</label>
+                        <select asp-for="CategoryId" class="input-premium" asp-items="ViewBag.Categories">
+                            <option value="">Choisir...</option>
+                        </select>
+                        <span asp-validation-for="CategoryId" class="text-danger" style="font-size: 11px;"></span>
+                    </div>
+                    <div class="form-group-premium w-32">
+                        <label asp-for="Points" class="form-label-premium">Points</label>
+                        <input asp-for="Points" type="number" class="input-premium" value="10" />
+                        <span asp-validation-for="Points" class="text-danger" style="font-size: 11px;"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column -->
+            <div class="form-col">
+                <div class="form-group-premium">
+                    <label asp-for="RecurrenceType" class="form-label-premium">Fréquence</label>
+                    <select asp-for="RecurrenceType" id="recurrenceSelector" class="input-premium">
+                        <option value="Once">Une seule fois</option>
+                        <option value="Daily">Quotidien</option>
+                        <option value="Weekly">Hebdomadaire</option>
+                        <option value="Monthly">Mensuel</option>
+                        <option value="Custom">Personnalisé</option>
+                    </select>
+                </div>
+
+                <div class="form-group-premium">
+                    <label asp-for="StartDate" class="form-label-premium">Date de début</label>
+                    <input asp-for="StartDate" type="date" class="input-premium" value="@DateTime.Now.ToString("yyyy-MM-dd")" />
+                </div>
+
+                <!-- Weekly Days -->
+                <div id="weeklyOptions" class="form-group-premium hidden">
+                    <label class="form-label-premium">Jours de la semaine</label>
+                    <div class="days-selector-premium">
+                        <input type="hidden" asp-for="WeeklyDays" id="weeklyDaysInput" />
+                        @{
+                            var dayLabels = new[] { "L", "M", "M", "J", "V", "S", "D" };
+                            for (int i = 1; i <= 7; i++)
+                            {
+                                <button type="button" class="day-chip-premium" data-day="@i">@dayLabels[i-1]</button>
+                            }
+                        }
+                    </div>
+                </div>
+
+                <!-- Custom Interval -->
+                <div id="customOptions" class="form-group-premium hidden">
+                    <label asp-for="CustomIntervalDays" class="form-label-premium">Intervalle (jours)</label>
+                    <input asp-for="CustomIntervalDays" type="number" class="input-premium" placeholder="Ex: 3" />
+                </div>
+
+                <!-- Monthly Day -->
+                <div id="monthlyOptions" class="form-group-premium hidden">
+                    <label asp-for="MonthlyDay" class="form-label-premium">Jour du mois</label>
+                    <input asp-for="MonthlyDay" type="number" min="1" max="31" class="input-premium" placeholder="Ex: 1" />
+                </div>
+            </div>
+        </div>
+
+        <button type="submit" class="btn-premium-lg mt-8">Créer la mission</button>
+    </form>
+</div>
+
+<style>
+    .grid-form-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; }
+    .hidden { display: none; }
+    
+    .days-selector-premium { display: flex; gap: 8px; }
+    .day-chip-premium {
+        width: 36px; height: 36px; border-radius: 12px;
+        border: 1px solid #E2E8F0; background: white;
+        font-size: 12px; font-weight: 800; color: #94A3B8;
+        display: flex; align-items: center; justify-content: center;
+        cursor: pointer; transition: 0.2s;
+    }
+    .day-chip-premium.active {
+        background: var(--color-primary);
+        color: white; border-color: var(--color-primary);
+        box-shadow: 0 4px 10px rgba(255, 90, 95, 0.2);
+    }
+</style>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        const selector = document.getElementById('recurrenceSelector');
+        const weeklyOpt = document.getElementById('weeklyOptions');
+        const customOpt = document.getElementById('customOptions');
+        const monthlyOpt = document.getElementById('monthlyOptions');
+
+        function updateOptions() {
+            weeklyOpt.classList.add('hidden');
+            customOpt.classList.add('hidden');
+            monthlyOpt.classList.add('hidden');
+
+            if (selector.value === 'Weekly') weeklyOpt.classList.remove('hidden');
+            if (selector.value === 'Custom') customOpt.classList.remove('hidden');
+            if (selector.value === 'Monthly') monthlyOpt.classList.remove('hidden');
+        }
+
+        selector.addEventListener('change', updateOptions);
+        updateOptions();
+
+        const dayChips = document.querySelectorAll('.day-chip-premium');
+        const weeklyInput = document.getElementById('weeklyDaysInput');
+        let selectedDays = weeklyInput.value ? weeklyInput.value.split(',') : [];
+
+        dayChips.forEach(chip => {
+            if (selectedDays.includes(chip.dataset.day)) chip.classList.add('active');
+
+            chip.addEventListener('click', function() {
+                const day = this.dataset.day;
+                if (selectedDays.includes(day)) {
+                    selectedDays = selectedDays.filter(d => d !== day);
+                    this.classList.remove('active');
+                } else {
+                    selectedDays.push(day);
+                    this.classList.add('active');
+                }
+                weeklyInput.value = selectedDays.join(',');
+            });
+        });
+    </script>
+}

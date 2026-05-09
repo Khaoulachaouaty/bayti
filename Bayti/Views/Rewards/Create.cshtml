@@ -1,0 +1,73 @@
+@model Bayti.Models.Reward
+@{
+    ViewData["Title"] = "Nouvelle récompense";
+}
+
+<div class="premium-form-card">
+    <a asp-action="Index" class="btn-back-minimal">
+        <i class="fa-solid fa-arrow-left"></i>
+    </a>
+    
+    <div class="mb-10">
+        <h1 class="form-title-premium">Ajouter une récompense</h1>
+        <p class="form-subtitle-premium">Ajoutez un cadeau ou un joker pour motiver vos colocs !</p>
+    </div>
+
+    <form asp-action="Create" method="post">
+        <div asp-validation-summary="ModelOnly" class="text-danger mb-4" style="font-size: 11px;"></div>
+        
+        <div class="form-group-premium">
+            <label asp-for="Name" class="form-label-premium">Titre de la récompense</label>
+            <input asp-for="Name" class="input-premium" placeholder="Ex: Soirée Pizza payée par l'admin" required />
+            <span asp-validation-for="Name" class="text-danger" style="font-size: 11px;"></span>
+        </div>
+
+        <div class="form-group-premium">
+            <label asp-for="Description" class="form-label-premium">Description (optionnel)</label>
+            <textarea asp-for="Description" class="input-premium" rows="2" placeholder="De quoi s'agit-il ?"></textarea>
+            <span asp-validation-for="Description" class="text-danger" style="font-size: 11px;"></span>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+            <div class="form-group-premium">
+                <label asp-for="Price" class="form-label-premium">Prix (Points)</label>
+                <input asp-for="Price" type="number" class="input-premium" style="color: #FF5A5F;" value="50" required />
+            </div>
+            <div class="form-group-premium">
+                <label class="form-label-premium">Type</label>
+                <div class="flex items-center mt-2" style="gap: 12px; background: #F8FAFC; padding: 12px 16px; border-radius: 18px; border: 1px solid rgba(0,0,0,0.02);">
+                     <input asp-for="IsJoker" type="checkbox" style="width: 18px; height: 18px; cursor: pointer;" />
+                     <label asp-for="IsJoker" class="mb-0" style="font-size: 13px; font-weight: 700; cursor: pointer; color: #475569;">Carte Joker</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group-premium">
+            <label class="form-label-premium">Icône (Emoji)</label>
+            <input asp-for="Emoji" id="emoji-input" class="input-premium mb-4" placeholder="Sélectionnez un emoji" required value="🎁" />
+            
+            <div class="flex gap-2 flex-wrap p-4" style="background: #F8FAFC; border-radius: 18px; border: 1px solid rgba(0,0,0,0.02); max-height: 180px; overflow-y: auto; scrollbar-width: none;">
+                @foreach (var emoji in new[] { 
+                    "🎁", "🍕", "🍔", "🍻", "🍷", "🎮", "🎫", "🎬", "✈️", "☕", "💰", "🏆", "👑", "🛌", "🛀", "💆‍♀️", "🍦", "🍩", "🍪", "🍫", "🍿", "🏀", "⚽", "🎵", "🎁", "💎", "🧴", "🧼"
+                })
+                {
+                    <div class="emoji-pick @(emoji == "🎁" ? "active-pick" : "")" onclick="selectEmoji('@emoji', this)">
+                        @emoji
+                    </div>
+                }
+            </div>
+        </div>
+
+        <button type="submit" class="btn-premium-lg mt-4">Enregistrer la récompense</button>
+    </form>
+</div>
+
+@section Scripts {
+    <script>
+        function selectEmoji(emoji, element) {
+            document.getElementById('emoji-input').value = emoji;
+            document.querySelectorAll('.emoji-pick').forEach(el => el.classList.remove('active-pick'));
+            element.classList.add('active-pick');
+        }
+    </script>
+}

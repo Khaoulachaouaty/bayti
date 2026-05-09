@@ -1,0 +1,254 @@
+@using System.Security.Claims
+@model IEnumerable<Bayti.Models.Reward>
+@{
+    ViewData["Title"] = "Boutique des Récompenses";
+    var userPoints = (int)ViewBag.UserPoints;
+    var isAdmin = User.FindFirst("IsAdmin")?.Value == "True";
+}
+
+<div class="header-section mb-10">
+    <div class="flex justify-between items-center gap-6">
+        <div>
+            <h1 class="page-title">Boutique & Récompenses 🎁✨</h1>
+            <p class="page-subtitle">Dépensez vos points durement gagnés ! Vous avez actuellement <strong style="color: var(--color-primary); font-size: 18px;">@userPoints pts</strong></p>
+        </div>
+        @if (isAdmin)
+        {
+            <a asp-action="Create" class="btn-premium">
+                <i class="fa-solid fa-plus mr-2"></i>
+                Nouvelle Récompense
+            </a>
+        }
+    </div>
+</div>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success mb-6 p-4" style="background: #ECFCCB; border: 1px solid #BEF264; border-radius: 16px; color: #3F6212; font-weight: 700;">
+        <i class="fa-solid fa-gift mr-2"></i> @TempData["SuccessMessage"]
+    </div>
+}
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger mb-6 p-4" style="background: #FEE2E2; border: 1px solid #FCA5A5; border-radius: 16px; color: #991B1B; font-weight: 700;">
+        <i class="fa-solid fa-triangle-exclamation mr-2"></i> @TempData["ErrorMessage"]
+    </div>
+}
+
+@if (!Model.Any())
+{
+    <div class="empty-state-fine">
+        <div class="empty-illustration">
+            <i class="fa-solid fa-store-slash"></i>
+        </div>
+        <p>La boutique est vide pour le moment. L'admin va bientôt ajouter des cadeaux !</p>
+    </div>
+}
+else
+{
+    <div class="rewards-grid-3">
+        @foreach (var reward in Model)
+        {
+            bool canAfford = userPoints >= reward.Price;
+            
+            <div class="reward-card @(canAfford ? "" : "disabled")">
+                <div class="reward-icon-wrapper">
+                    <span class="emoji-icon">@(string.IsNullOrEmpty(reward.Emoji) ? "🎁" : reward.Emoji)</span>
+                    @if (reward.IsJoker)
+                    {
+                        <div class="joker-badge">JOKER</div>
+                    }
+                </div>
+
+                @if (isAdmin)
+                {
+                    <div class="admin-actions">
+                        <a asp-action="Edit" asp-route-id="@reward.Id" class="action-btn edit" title="Modifier">
+                            <i class="fa-solid fa-pen-to-square"></i>
+                        </a>
+                        <button type="button" class="action-btn delete" onclick="confirmDeleteReward(@reward.Id, '@reward.Name.Replace("'", "\\'")')" title="Supprimer">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </div>
+                }
+                
+                <h3 class="reward-title">@reward.Name</h3>
+                <p class="reward-desc">@reward.Description</p>
+                
+                <div class="reward-footer mt-auto">
+                    <div class="price-tag @(canAfford ? "affordable" : "expensive")">
+                        <i class="fa-solid fa-bolt-lightning"></i> @reward.Price pts
+                    </div>
+                    
+                    <form asp-action="Buy" asp-route-id="@reward.Id" method="post" onsubmit="return confirm('Voulez-vous vraiment acheter @reward.Name pour @reward.Price points ?')">
+                        <button type="submit" class="btn-buy" disabled="@(!canAfford)">
+                            @(canAfford ? "Acheter" : "Fonds insuffisants")
+                        </button>
+                    </form>
+                </div>
+            </div>
+        }
+    </div>
+}
+
+<form id="deleteRewardForm" asp-action="Delete" method="post" style="display:none;">
+    <input type="hidden" name="id" id="deleteRewardId" />
+</form>
+
+<!-- Modern Danger Modal -->
+<div id="dangerModal" class="modal-overlay">
+    <div class="modal-container" style="max-width: 420px; border-radius: 36px;">
+        <div class="modal-header" style="padding-top: 40px;">
+            <div class="modal-icon-circle" style="background: var(--color-danger-bg); color: var(--color-danger); width: 80px; height: 80px; font-size: 32px;">
+                <i class="fa-solid fa-trash-can"></i>
+            </div>
+            <h2 class="modal-title" style="font-size: 24px;">Supprimer ?</h2>
+        </div>
+        <div class="modal-body" style="text-align: center; padding: 0 30px 30px;">
+            Voulez-vous vraiment supprimer <strong id="deleteRewardName"></strong> ?
+            <p style="margin-top: 15px; color: var(--color-text-secondary); font-size: 14px;">Cette récompense ne sera plus disponible dans la boutique.</p>
+        </div>
+        <div class="modal-footer" style="padding: 0 30px 40px; gap: 15px;">
+            <button type="button" class="btn btn-outline flex-1" onclick="closeDangerModal()" style="height: 56px; border-radius: 18px; font-weight: 700;">Annuler</button>
+            <button type="button" id="confirmDeleteBtn" class="btn flex-1" style="height: 56px; border-radius: 18px; font-weight: 700; background: var(--color-danger); color: white; border: none;">Supprimer</button>
+        </div>
+    </div>
+</div>
+
+<style>
+    .reward-card {
+        background: rgba(255, 255, 255, 0.8);
+        backdrop-filter: blur(20px);
+        border: 2px solid rgba(255, 255, 255, 0.9);
+        border-radius: 36px;
+        padding: 30px;
+        display: flex;
+        flex-direction: column;
+        transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+        position: relative;
+        box-shadow: 0 10px 30px rgba(13, 148, 136, 0.05);
+    }
+    .reward-card:not(.disabled):hover {
+        transform: translateY(-10px) scale(1.02);
+        border-color: rgba(251, 191, 36, 0.4);
+        box-shadow: 0 25px 50px rgba(251, 191, 36, 0.15);
+    }
+    .reward-card.disabled {
+        opacity: 0.6;
+        filter: grayscale(0.6);
+    }
+
+    .reward-icon-wrapper {
+        width: 80px; height: 80px;
+        background: linear-gradient(135deg, #FEF3C7 0%, #FDE68A 100%);
+        border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        margin-bottom: 24px;
+        position: relative;
+        box-shadow: inset 0 -4px 8px rgba(251, 191, 36, 0.2), 0 10px 20px rgba(251, 191, 36, 0.3);
+    }
+    .emoji-icon { font-size: 40px; }
+
+    .joker-badge {
+        position: absolute;
+        top: -10px; right: -20px;
+        background: #F43F5E; color: white;
+        font-size: 10px; font-weight: 900; letter-spacing: 1px;
+        padding: 4px 10px; border-radius: 12px;
+        box-shadow: 0 4px 10px rgba(244, 63, 94, 0.3);
+        transform: rotate(5deg);
+    }
+
+    .reward-title {
+        font-size: 18px; font-weight: 800; color: var(--color-text-primary); margin-bottom: 8px; line-height: 1.2;
+    }
+    .reward-desc {
+        font-size: 13px; color: var(--color-text-secondary); line-height: 1.5; margin-bottom: 24px;
+    }
+
+    .reward-footer {
+        display: flex; flex-direction: column; gap: 12px;
+    }
+
+    .price-tag {
+        display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+        font-size: 15px; font-weight: 900; padding: 10px; border-radius: 14px;
+    }
+    .affordable { background: #FEF9C3; color: #854D0E; }
+    .expensive { background: #F1F5F9; color: #94A3B8; }
+
+    .btn-buy {
+        width: 100%; padding: 16px; border-radius: 20px; font-size: 15px; font-weight: 900;
+        border: 2px solid white; cursor: pointer; transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .btn-buy:not([disabled]) {
+        background: linear-gradient(135deg, #FBBF24 0%, #F59E0B 100%); color: white;
+        box-shadow: 0 10px 20px rgba(245, 158, 11, 0.25);
+    }
+    .btn-buy:not([disabled]):hover { 
+        transform: translateY(-4px) scale(1.02); 
+        box-shadow: 0 15px 30px rgba(245, 158, 11, 0.4);
+    }
+    .btn-buy[disabled] { background: #F1F5F9; color: #94A3B8; cursor: not-allowed; }
+
+    /* Admin Actions Overlay */
+    .admin-actions {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        display: flex;
+        gap: 8px;
+        opacity: 0;
+        transform: translateY(-5px);
+        transition: all 0.3s ease;
+    }
+    .reward-card:hover .admin-actions {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    .action-btn {
+        width: 36px;
+        height: 36px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: none;
+        cursor: pointer;
+        transition: all 0.2s;
+        font-size: 14px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        text-decoration: none !important;
+    }
+    .action-btn.edit { background: white; color: var(--color-primary); }
+    .action-btn.delete { background: var(--color-danger-bg); color: var(--color-danger); }
+    .action-btn:hover { transform: scale(1.1); filter: brightness(0.95); }
+</style>
+
+<script>
+    function confirmDeleteReward(id, name) {
+        document.getElementById('deleteRewardId').value = id;
+        document.getElementById('deleteRewardName').textContent = name;
+        
+        const modal = document.getElementById('dangerModal');
+        modal.style.display = 'flex';
+        setTimeout(() => modal.classList.add('active'), 10);
+    }
+
+    function closeDangerModal() {
+        const modal = document.getElementById('dangerModal');
+        modal.classList.remove('active');
+        setTimeout(() => modal.style.display = 'none', 300);
+    }
+
+    document.getElementById('confirmDeleteBtn').addEventListener('click', function() {
+        document.getElementById('deleteRewardForm').submit();
+    });
+
+    window.onclick = function(event) {
+        const modal = document.getElementById('dangerModal');
+        if (event.target == modal) {
+            closeDangerModal();
+        }
+    }
+</script>

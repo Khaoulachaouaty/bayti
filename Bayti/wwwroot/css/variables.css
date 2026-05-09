@@ -1,0 +1,85 @@
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap');
+
+:root {
+    /* ── PALETTE BAYTI (tirée du logo) ─────────────────── */
+    /* Corail Saumon du logo */
+    --coral:            #F76B6B;
+    --coral-dark:       #E85555;
+    --coral-light:      #FF8A8A;
+    --coral-bg:         #FFF0F0;
+    --coral-glow:       0 0 0 4px rgba(247, 107, 107, 0.15);
+
+    /* Fond Doux – ambiance maison propre */
+    --bg:               #FAFAFA;
+    --bg-2:             #F4F4F6;
+    --surface:          #FFFFFF;
+
+    /* Neutrals – Navy foncé comme le texte du logo */
+    --ink:              #1C1C28;
+    --ink-2:            #3D3D4E;
+    --ink-3:            #6B6B80;
+    --ink-4:            #A0A0B5;
+
+    /* Bordures douces */
+    --border:           #EBEBF0;
+    --border-strong:    #D5D5DF;
+
+    /* Accents secondaires – Chaleur Maison */
+    --amber:            #F5A623;
+    --amber-bg:         #FFF8EC;
+    --green:            #34C47C;
+    --green-bg:         #EDFAF4;
+    --blue:             #4A90E2;
+    --blue-bg:          #EDF4FD;
+    --purple:           #9B5CE5;
+    --purple-bg:        #F4EFFE;
+    --red:              #F44336;
+    --red-bg:           #FFF0EF;
+
+    /* ── TYPOGRAPHY ──────────────────────────────────── */
+    --font-display: 'Nunito', sans-serif;
+    --font-body:    'Inter', sans-serif;
+
+    /* ── SPACING ─────────────────────────────────────── */
+    --s1:  4px;
+    --s2:  8px;
+    --s3:  12px;
+    --s4:  16px;
+    --s5:  20px;
+    --s6:  24px;
+    --s8:  32px;
+    --s10: 40px;
+    --s12: 48px;
+
+    /* ── RADII ────────────────────────────────────────── */
+    --r-xs:  6px;
+    --r-sm:  10px;
+    --r-md:  14px;
+    --r-lg:  20px;
+    --r-xl:  28px;
+    --r-2xl: 40px;
+    --r-full: 9999px;
+
+    /* ── SHADOWS ──────────────────────────────────────── */
+    --shadow-xs:    0 1px 3px rgba(28,28,40,0.06), 0 1px 2px rgba(28,28,40,0.04);
+    --shadow-sm:    0 4px 12px rgba(28,28,40,0.07), 0 1px 3px rgba(28,28,40,0.05);
+    --shadow-md:    0 8px 24px rgba(28,28,40,0.09), 0 2px 8px rgba(28,28,40,0.05);
+    --shadow-lg:    0 16px 40px rgba(28,28,40,0.11), 0 4px 12px rgba(28,28,40,0.06);
+    --shadow-coral: 0 8px 24px rgba(247,107,107,0.30);
+    --shadow-coral-sm: 0 4px 14px rgba(247,107,107,0.22);
+
+    /* ── GRADIENTS ────────────────────────────────────── */
+    --grad-coral:  linear-gradient(135deg, #F76B6B 0%, #FF9494 100%);
+    --grad-warm:   linear-gradient(135deg, #F5A623 0%, #F7D070 100%);
+    --grad-hero:   linear-gradient(140deg, #F76B6B 0%, #FF8A8A 55%, #FFB3A7 100%);
+    --grad-subtle: linear-gradient(180deg, #FFFFFF 0%, #FAFAFA 100%);
+
+    /* ── LAYOUT ───────────────────────────────────────── */
+    --sidebar-w: 265px;
+    --max-w:     1180px;
+
+    /* ── TRANSITIONS ──────────────────────────────────── */
+    --t-fast:   0.16s cubic-bezier(0.2,0,0,1);
+    --t-base:   0.26s cubic-bezier(0.2,0,0,1);
+    --t-spring: 0.38s cubic-bezier(0.34,1.56,0.64,1);
+}

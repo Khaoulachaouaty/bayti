@@ -1,0 +1,82 @@
+@model Bayti.Models.Category
+@{
+    ViewData["Title"] = "Modifier la catégorie";
+}
+
+<div class="premium-form-card">
+    <a asp-action="Index" class="btn-back-minimal">
+        <i class="fa-solid fa-arrow-left"></i>
+    </a>
+    
+    <div class="mb-10">
+        <h1 class="form-title-premium">Modifier la catégorie</h1>
+        <p class="form-subtitle-premium">Mettez à jour les informations de <strong>@Model.Name</strong>.</p>
+    </div>
+
+    <form asp-action="Edit" method="post">
+        <input type="hidden" asp-for="Id" />
+        
+        <div class="form-group-premium">
+            <label asp-for="Name" class="form-label-premium">Nom de la catégorie</label>
+            <input asp-for="Name" class="input-premium" placeholder="Ex: Ménage, Courses..." required />
+            <span asp-validation-for="Name" class="text-danger" style="font-size: 11px; margin-top: 5px; display: block;"></span>
+        </div>
+
+        <div class="form-group-premium">
+            <label asp-for="Description" class="form-label-premium">Description</label>
+            <textarea asp-for="Description" class="input-premium" rows="3" placeholder="De quoi s'agit-il ?">@Model.Description</textarea>
+            <span asp-validation-for="Description" class="text-danger" style="font-size: 11px; margin-top: 5px; display: block;"></span>
+        </div>
+
+        <div class="form-group-premium">
+            <label class="form-label-premium">Icône ou Emoji</label>
+            <div class="flex gap-4 items-center mb-4">
+                <div id="icon-preview" style="width: 56px; height: 56px; background: #FFF1F2; color: #FF5A5F; border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 24px; flex-shrink: 0;">
+                    @if (Model.Icon != null && Model.Icon.StartsWith("fa-"))
+                    {
+                        <i class="fa-solid @Model.Icon"></i>
+                    }
+                    else
+                    {
+                        <span>@(Model.Icon ?? "🏷️")</span>
+                    }
+                </div>
+                <input asp-for="Icon" id="icon-input" class="input-premium" placeholder="Emoji ou fa-broom" required oninput="updatePreview(this.value)" />
+            </div>
+            
+            <div class="flex gap-2 flex-wrap p-4" style="background: #F8FAFC; border-radius: 18px; border: 1px solid rgba(0,0,0,0.02); max-height: 180px; overflow-y: auto; scrollbar-width: none;">
+                @foreach (var emoji in new[] { 
+                    "🧹", "🧽", "🧼", "🪠", "🗑️", "🧴", "🧤", "🍽️", "🍳", "🛒", "🍎", "🍷", "🧺", "👕", "👗", "🛋️", "🛏️", "🛁", "🚿", "🚽", "🔨", "🛠️", "💡", "🔌", "🌱", "🪴", "🐾", "🐶", "🐱", "💰", "📄", "🔑", "📦", "🗓️", "🚗", "🚲", "🌿"
+                })
+                {
+                    <div class="emoji-pick" onclick="selectIcon('@emoji')">
+                        @emoji
+                    </div>
+                }
+            </div>
+        </div>
+
+        <button type="submit" class="btn-premium-lg mt-4">Enregistrer les modifications</button>
+    </form>
+</div>
+
+@section Scripts {
+    <script>
+        function selectIcon(icon) {
+            const input = document.getElementById('icon-input');
+            input.value = icon;
+            updatePreview(icon);
+            document.querySelectorAll('.emoji-pick').forEach(el => el.classList.remove('active-pick'));
+            event.currentTarget.classList.add('active-pick');
+        }
+
+        function updatePreview(val) {
+            const preview = document.getElementById('icon-preview');
+            if (val.startsWith('fa-')) {
+                preview.innerHTML = `<i class="fa-solid ${val}"></i>`;
+            } else {
+                preview.innerHTML = `<span>${val || '🏷️'}</span>`;
+            }
+        }
+    </script>
+}

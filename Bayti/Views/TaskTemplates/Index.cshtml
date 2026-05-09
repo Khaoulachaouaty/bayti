@@ -1,0 +1,122 @@
+@model IEnumerable<Bayti.Models.TaskTemplate>
+@{
+    ViewData["Title"] = "Règles des Tâches";
+    var isAdmin = User.FindFirstValue("IsAdmin") == "True";
+    var groupedTasks = Model.GroupBy(t => t.Category?.Name ?? "Sans catégorie");
+}
+
+<div class="header-section mb-10 flex justify-between items-center">
+    <div>
+        <h1 class="page-title">Règles & Automatisations ⚡</h1>
+        <p class="text-muted">Gérez la génération automatique des tâches de votre tribu.</p>
+    </div>
+    @if (isAdmin) {
+        <a asp-action="Create" class="btn btn-premium">
+            <i class="fa-solid fa-plus mr-2"></i> Nouvelle règle
+        </a>
+    }
+</div>
+
+<div class="stats-row-modern mb-10">
+    <div class="stat-box">
+        <div class="icon" style="background: var(--color-primary-bg); color: var(--color-primary);"><i class="fa-solid fa-robot"></i></div>
+        <div class="info">
+            <span class="label">Règles actives</span>
+            <span class="val">@Model.Count(t => !t.IsPaused)</span>
+        </div>
+    </div>
+    <div class="stat-box">
+        <div class="icon" style="background: #FFFBEB; color: #D97706; text-transform: uppercase;"><i class="fa-solid fa-bolt"></i></div>
+        <div class="info">
+            <span class="label">Points potentiels / jour</span>
+            <span class="val">@Model.Where(t => t.RecurrenceType == "Daily").Sum(t => t.Points)</span>
+        </div>
+    </div>
+</div>
+
+<div class="rules-modern-stack">
+    @foreach (var group in groupedTasks) {
+        <div class="rule-group-section mb-8">
+            <h2 class="group-title">@group.Key</h2>
+            <div class="rules-grid">
+                @foreach (var item in group) {
+                    <div class="rule-premium-card @(item.IsPaused ? "is-paused" : "")">
+                        <div class="rule-card-header">
+                            <div class="rule-recurrence">
+                                <i class="fa-solid fa-clock-rotate-left"></i>
+                                <span>@(item.RecurrenceType == "Daily" ? "Chaque jour" : item.RecurrenceType == "Weekly" ? "Hebdomadaire" : "Mensuel")</span>
+                            </div>
+                            <div class="rule-points">+@item.Points</div>
+                        </div>
+                        <h3 class="rule-title">@item.Title</h3>
+                        <p class="rule-desc">@item.Description</p>
+                        
+                        <div class="rule-footer">
+                            <div class="rule-status">
+                                <span class="status-dot"></span>
+                                @(item.IsPaused ? "En pause" : "Active")
+                            </div>
+                            <div class="rule-actions">
+                                <a asp-action="TogglePause" asp-route-id="@item.Id" class="action-btn @(item.IsPaused ? "resume" : "pause")" title="@(item.IsPaused ? "Reprendre" : "Mettre en pause")">
+                                    <i class="fa-solid @(item.IsPaused ? "fa-play" : "fa-pause")"></i>
+                                </a>
+                                <a asp-action="Edit" asp-route-id="@item.Id" class="action-btn edit" title="Modifier">
+                                    <i class="fa-solid fa-pen"></i>
+                                </a>
+                                <form asp-action="Delete" asp-route-id="@item.Id" method="post" onsubmit="return confirm('Supprimer cette règle ?')" style="display:inline;">
+                                    <button type="submit" class="action-btn delete" title="Supprimer">
+                                        <i class="fa-solid fa-trash-can"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+</div>
+
+@if (!Model.Any()) {
+    <div class="empty-state-dashboard" style="padding: 100px 0;">
+        <i class="fa-solid fa-wand-magic-sparkles" style="font-size: 64px; opacity: 0.1;"></i>
+        <h2 style="font-weight: 850; color: var(--color-text-primary); margin-bottom: 8px;">Aucune règle</h2>
+        <p class="text-muted">Automatisez vos tâches quotidiennes pour gagner du temps.</p>
+    </div>
+}
+
+<style>
+    .page-title { font-size: 32px; font-weight: 850; color: var(--color-text-primary); letter-spacing: -1px; }
+    .stats-row-modern { display: flex; gap: 24px; }
+    .stat-box { flex: 1; background: white; padding: 20px; border-radius: 24px; border: 1px solid var(--color-border); display: flex; align-items: center; gap: 16px; }
+    .stat-box .icon { width: 48px; height: 48px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+    .stat-box .label { display: block; font-size: 11px; font-weight: 800; color: var(--color-text-muted); text-transform: uppercase; }
+    .stat-box .val { font-size: 20px; font-weight: 900; color: var(--color-text-primary); }
+
+    .group-title { font-size: 16px; font-weight: 850; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 20px; border-left: 4px solid var(--color-primary); padding-left: 12px; }
+    
+    .rules-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 24px; }
+    .rule-premium-card { background: white; border-radius: 28px; border: 1px solid var(--color-border); padding: 24px; transition: all 0.3s; position: relative; }
+    .rule-premium-card:hover { border-color: var(--color-primary); box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
+    .rule-premium-card.is-paused { opacity: 0.6; background: #F9FAFB; }
+
+    .rule-card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+    .rule-recurrence { font-size: 11px; font-weight: 800; color: #64748B; background: #F1F5F9; padding: 4px 10px; border-radius: 8px; display: flex; align-items: center; gap: 6px; }
+    .rule-points { font-weight: 900; color: var(--color-primary); font-size: 18px; }
+
+    .rule-title { font-size: 18px; font-weight: 800; color: var(--color-text-primary); margin-bottom: 6px; }
+    .rule-desc { font-size: 13px; color: var(--color-text-secondary); line-height: 1.5; margin-bottom: 24px; min-height: 40px; }
+
+    .rule-footer { display: flex; justify-content: space-between; align-items: center; padding-top: 16px; border-top: 1px solid #F1F5F9; }
+    .rule-status { display: flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 800; text-transform: uppercase; color: #64748B; }
+    .status-dot { width: 8px; height: 8px; border-radius: 50%; background: #10B981; }
+    .is-paused .status-dot { background: #94A3B8; }
+
+    .rule-actions { display: flex; gap: 6px; }
+    .action-btn { width: 34px; height: 34px; border-radius: 10px; display: flex; align-items: center; justify-content: center; background: #F8FAFC; color: #94A3B8; border: 1px solid #F1F5F9; transition: 0.2s; cursor: pointer; text-decoration: none; font-size: 12px; }
+    .action-btn:hover { transform: scale(1.1); color: var(--color-text-primary); background: white; }
+    .action-btn.pause:hover { color: #D97706; background: #FFFBEB; }
+    .action-btn.resume:hover { color: #10B981; background: #ECFDF5; }
+    .action-btn.edit:hover { color: var(--color-accent); background: var(--color-accent-bg); }
+    .action-btn.delete:hover { color: var(--color-danger); background: var(--color-danger-bg); }
+</style>

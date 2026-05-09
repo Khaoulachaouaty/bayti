@@ -1,0 +1,58 @@
+@model Bayti.Models.Category
+@{
+    ViewData["Title"] = "Nouvelle catégorie";
+}
+
+<div class="premium-form-card">
+    <a asp-action="Index" class="btn-back-minimal">
+        <i class="fa-solid fa-arrow-left"></i>
+    </a>
+    
+    <div class="mb-10">
+        <h1 class="form-title-premium">Créer une catégorie</h1>
+        <p class="form-subtitle-premium">Définissez un nouveau type d'activité pour votre colocation.</p>
+    </div>
+
+    <form asp-action="Create" method="post">
+        <div class="form-group-premium">
+            <label asp-for="Name" class="form-label-premium">Nom de la catégorie</label>
+            <input asp-for="Name" class="input-premium" placeholder="Ex: Ménage, Courses, Vaisselle..." required />
+            <span asp-validation-for="Name" class="text-danger" style="font-size: 11px; margin-top: 5px; display: block;"></span>
+        </div>
+
+        <div class="form-group-premium">
+            <label asp-for="Description" class="form-label-premium">Description (optionnel)</label>
+            <textarea asp-for="Description" class="input-premium" rows="2" placeholder="De quoi s'agit-il ?"></textarea>
+            <span asp-validation-for="Description" class="text-danger" style="font-size: 11px; margin-top: 5px; display: block;"></span>
+        </div>
+
+        <div class="form-group-premium">
+            <label class="form-label-premium">Icône ou Emoji</label>
+            <input asp-for="Icon" id="icon-input" class="input-premium mb-4" placeholder="Saisissez un emoji ou une classe FontAwesome" required />
+            
+            <div class="flex gap-2 flex-wrap p-4" style="background: #F8FAFC; border-radius: 18px; border: 1px solid rgba(0,0,0,0.02); max-height: 180px; overflow-y: auto; scrollbar-width: none;">
+                @foreach (var emoji in new[] { 
+                    "🧹", "🧽", "🧼", "🪠", "🗑️", "🧴", "🧤", "🍽️", "🍳", "🛒", "🍎", "🍷", "🧺", "👕", "👗", "🛋️", "🛏️", "🛁", "🚿", "🚽", "🔨", "🛠️", "💡", "🔌", "🌱", "🪴", "🐾", "🐶", "🐱", "💰", "📄", "🔑", "📦", "🗓️", "🚗", "🚲", "🌿"
+                })
+                {
+                    <div class="emoji-pick" onclick="selectIcon('@emoji')">
+                        @emoji
+                    </div>
+                }
+            </div>
+            <p class="text-muted mt-3" style="font-size: 11px; font-weight: 600;">Astuce : Utilisez des classes FontAwesome comme <code>fa-broom</code> pour plus de style.</p>
+        </div>
+
+        <button type="submit" class="btn-premium-lg mt-4">Enregistrer la catégorie</button>
+    </form>
+</div>
+
+@section Scripts {
+    <script>
+        function selectIcon(icon) {
+            document.getElementById('icon-input').value = icon;
+            document.querySelectorAll('.emoji-pick').forEach(el => el.classList.remove('active-pick'));
+            event.currentTarget.classList.add('active-pick');
+        }
+    </script>
+}
