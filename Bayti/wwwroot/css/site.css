@@ -39,19 +39,28 @@ a:hover { color: var(--coral-dark); }
 }
 
 /* ── APP SHELL ────────────────────────────────── */
-.bayti-app { display: flex; height: 100vh; position: relative; z-index: 1; }
+.bayti-app { 
+    display: flex; 
+    height: 100vh; 
+    padding: 16px; 
+    gap: 16px; 
+    position: relative; 
+    z-index: 1; 
+}
 
 /* ── SIDEBAR ──────────────────────────────────── */
 .bayti-sidebar, .sidebar {
     width: var(--sidebar-w);
     min-width: var(--sidebar-w);
-    background: var(--grad-sidebar);
+    background: var(--surface);
     display: flex;
     flex-direction: column;
     overflow: hidden;
     position: relative;
     z-index: 10;
-    box-shadow: 4px 0 24px rgba(26,29,46,0.18);
+    border-radius: var(--r-xl);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-sm);
 }
 /* Sidebar decorative circles */
 .sidebar::before {
@@ -144,7 +153,17 @@ a:hover { color: var(--coral-dark); }
 .sb-logout:hover { background: var(--coral-bg); color: var(--coral); }
 
 /* ── MAIN CONTENT ─────────────────────────────── */
-.bayti-main { flex: 1; overflow-y: auto; scrollbar-width: thin; scrollbar-color: var(--border) transparent; background: var(--bg); position: relative; }
+.bayti-main { 
+    flex: 1; 
+    overflow-y: auto; 
+    scrollbar-width: thin; 
+    scrollbar-color: var(--border) transparent; 
+    background: var(--surface); 
+    position: relative; 
+    border-radius: var(--r-xl);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-sm);
+}
 .bayti-main::-webkit-scrollbar { width: 5px; }
 .bayti-main::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 10px; }
 .page-wrap { max-width: var(--max-w); margin: 0 auto; padding: 36px 40px; }
