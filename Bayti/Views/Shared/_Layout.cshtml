@@ -46,7 +46,7 @@
 
         <!-- Mini Stats -->
         @{
-            var uid = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var uid = User.FindFirstValue("UserId");
             int pts = 0;
             string joinCode = User.FindFirstValue("JoinCode") ?? "---";
             if (!string.IsNullOrEmpty(uid)) {

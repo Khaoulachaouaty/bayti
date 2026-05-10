@@ -36,23 +36,21 @@ namespace Bayti.Controllers
 
             if (mode == "Participatif")
             {
-                // Show ALL tasks for the colocation for TODAY only
+                // Show ALL tasks for the colocation for TODAY only (including Completed ones for the progress bar)
                 tasksQuery = _context.TaskInstances
                     .Include(i => i.TaskTemplate)
                         .ThenInclude(t => t.Category)
                     .Include(i => i.AssignedUser)
                     .Where(i => i.TaskTemplate.ColocationId == colocationId
-                             && i.Status != "Completed"
                              && i.DueDate.Date == today);
             }
             else
             {
-                // Auto or Manuel: show only tasks assigned to the current user for TODAY
+                // Auto or Manuel: show only tasks assigned to the current user for TODAY (including Completed ones)
                 tasksQuery = _context.TaskInstances
                     .Include(i => i.TaskTemplate)
                         .ThenInclude(t => t.Category)
                     .Where(i => i.TaskTemplate.ColocationId == colocationId
-                             && i.Status != "Completed"
                              && i.DueDate.Date == today
                              && i.AssignedUserId == userId);
             }
