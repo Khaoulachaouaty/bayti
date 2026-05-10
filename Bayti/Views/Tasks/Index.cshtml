@@ -8,148 +8,134 @@
     int currentUserId = int.Parse(User.FindFirst("UserId")?.Value ?? "0");
 }
 
-<div class="header-section mb-8">
-    <div class="flex justify-between items-center gap-6">
-        <div>
-            <h1 class="page-title">Mes Tâches 🧹</h1>
-            <p class="text-muted">Aujourd'hui, @DateTime.Now.ToString("dd MMMM")</p>
-        </div>
-        <div class="flex gap-3">
-             @if (User.FindFirst("IsAdmin")?.Value == "True")
-             {
-                <a asp-action="Manage" class="btn btn-premium-sm" style="background: var(--color-primary-bg); color: var(--color-primary);">
-                    <i class="fa-solid fa-crown mr-2"></i> Gérer
-                </a>
-             }
-        </div>
-    </div>
-</div>
+<div class="page-wrap">
 
-<!-- Progress Card -->
-<div class="card fine-card mb-8 shadow-premium" style="padding: 24px; background: white; border: none;">
-    <div class="flex justify-between items-center mb-4">
-        <div class="flex items-center gap-3">
-            <div style="width: 44px; height: 44px; background: var(--color-primary-bg); border-radius: 14px; display: flex; align-items: center; justify-content: center; color: var(--color-primary); font-size: 20px;">
-                <i class="fa-solid fa-sparkles"></i>
-            </div>
+    <!-- Header -->
+    <div class="page-header">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
             <div>
-                <div style="font-weight: 850; font-size: 18px; color: var(--color-text-primary);">Votre mission brillance</div>
-                <div style="font-size: 13px; color: var(--color-text-secondary); font-weight: 600;">@completedCount sur @totalCount tâches terminées</div>
+                <h1 class="page-title">🧹 Mes Tâches</h1>
+                <p class="page-subtitle">@DateTime.Now.ToString("dddd dd MMMM", new System.Globalization.CultureInfo("fr-FR"))</p>
             </div>
+            @if (User.FindFirst("IsAdmin")?.Value == "True")
+            {
+                <a asp-action="Manage" class="btn btn-ghost">
+                    <i class="fa-solid fa-crown"></i> Gérer toutes
+                </a>
+            }
         </div>
-        <div style="font-size: 24px; font-weight: 900; color: var(--color-primary);">@progress%</div>
     </div>
-    <div class="progress-track" style="height: 12px; background: #F1F5F9; border-radius: 6px; overflow: hidden;">
-        <div class="progress-bar" style="width: @progress%; background: var(--gradient-primary); height: 100%; border-radius: 6px; transition: width 0.8s ease;"></div>
-    </div>
-</div>
 
-@if (!Model.Any())
-{
-    <div class="empty-state-dashboard" style="padding: 100px 0;">
-        <div class="empty-icon-wrapper" style="font-size: 64px; opacity: 0.1;">
-            <i class="fa-solid fa-mug-hot"></i>
-        </div>
-        <h2 style="font-weight: 850; color: var(--color-text-primary); margin-bottom: 8px;">Maison étincelante !</h2>
-        <p class="text-muted">Vous n'avez aucune mission pour le moment. Profitez de votre café ! ☕</p>
-    </div>
-}
-else
-{
-    <div class="tasks-modern-grid">
-        @foreach (var item in Model.OrderBy(t => t.Status == "Completed").ThenBy(t => t.DueDate))
-        {
-            <div class="task-modern-card @(item.Status == "Completed" ? "is-done" : "")">
-                <div class="task-card-icon">
-                    @if (item.TaskTemplate.Category?.Icon != null && item.TaskTemplate.Category.Icon.StartsWith("fa-")) {
-                        <i class="fa-solid @item.TaskTemplate.Category.Icon"></i>
-                    } else {
-                        <span>@(item.TaskTemplate.Category?.Icon ?? "✨")</span>
-                    }
+    <!-- Progress -->
+    <div class="progress-card card card-p mb-6">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+            <div style="display:flex; align-items:center; gap:14px;">
+                <div class="ibox ibox-md ibox-coral"><i class="fa-solid fa-broom"></i></div>
+                <div>
+                    <div style="font-weight:800; font-size:17px; color:var(--ink);">Mission Brillance ✨</div>
+                    <div style="font-size:13px; color:var(--ink-3); font-weight:500; margin-top:2px;">@completedCount sur @totalCount tâches terminées</div>
                 </div>
-                <div class="task-card-content">
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <h3 class="task-card-title">@item.TaskTemplate.Title</h3>
-                            <div class="task-card-meta">
-                                <span class="badge @(item.DueDate < DateTime.Now && item.Status != "Completed" ? "badge-danger" : "badge-soft")">
-                                    <i class="fa-solid fa-clock"></i> @item.DueDate.ToString("HH:mm")
-                                </span>
-                                <span class="dot">•</span>
-                                <span class="cat-name">@item.TaskTemplate.Category?.Name</span>
-                            </div>
+            </div>
+            <div style="font-family:var(--font-display); font-size:30px; font-weight:900; color:var(--coral);">@progress%</div>
+        </div>
+        <div class="prog-track">
+            <div class="prog-fill" style="width:@progress%"></div>
+        </div>
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="empty-state">
+            <div class="empty-state-icon">☕</div>
+            <h3>Maison étincelante !</h3>
+            <p>Aucune mission pour le moment. Profitez de votre café !</p>
+        </div>
+    }
+    else
+    {
+        <div class="tasks-grid">
+            @foreach (var item in Model.OrderBy(t => t.Status == "Completed").ThenBy(t => t.DueDate))
+            {
+                <div class="task-card @(item.Status == "Completed" ? "is-done" : "")">
+                    <div class="tc-icon">
+                        @if (item.TaskTemplate.Category?.Icon?.StartsWith("fa-") == true) {
+                            <i class="fa-solid @item.TaskTemplate.Category.Icon"></i>
+                        } else {
+                            <span>@(item.TaskTemplate.Category?.Icon ?? "✨")</span>
+                        }
+                    </div>
+                    <div class="tc-body">
+                        <div class="tc-top">
+                            <h3 class="tc-title">@item.TaskTemplate.Title</h3>
+                            <div class="tc-pts">+@item.TaskTemplate.Points ⭐</div>
                         </div>
-                        <div class="task-card-points">
-                            +@item.TaskTemplate.Points <span>pts</span>
+                        <div class="tc-meta">
+                            <span class="badge @(item.DueDate < DateTime.Now && item.Status != "Completed" ? "badge-red" : "badge-blue")">
+                                <i class="fa-solid fa-clock"></i> @item.DueDate.ToString("HH:mm")
+                            </span>
+                            @if (item.TaskTemplate.Category != null) {
+                                <span class="badge badge-mint">@item.TaskTemplate.Category.Name</span>
+                            }
                         </div>
                     </div>
+                    <div class="tc-action">
+                        @if (item.Status == "Completed") {
+                            <div class="done-badge"><i class="fa-solid fa-circle-check"></i> Fait !</div>
+                        } else {
+                            <form asp-action="Complete" asp-route-id="@item.Id" method="post">
+                                <button type="submit" class="btn-complete">
+                                    <i class="fa-solid fa-check"></i> Terminer
+                                </button>
+                            </form>
+                        }
+                    </div>
                 </div>
-                <div class="task-card-action">
-                    @if (item.Status == "Completed")
-                    {
-                        <div class="done-check">
-                            <i class="fa-solid fa-circle-check"></i>
-                        </div>
-                    }
-                    else
-                    {
-                        <form asp-action="Complete" asp-route-id="@item.Id" method="post">
-                            <button type="submit" class="btn-complete-modern">
-                                <i class="fa-solid fa-check"></i>
-                                Terminer
-                            </button>
-                        </form>
-                    }
-                </div>
-            </div>
-        }
-    </div>
-}
+            }
+        </div>
+    }
+</div>
 
 <style>
-    .page-title { font-size: 32px; font-weight: 850; color: var(--color-text-primary); letter-spacing: -1px; }
-    .tasks-modern-grid { display: flex; flex-direction: column; gap: 16px; }
-    
-    .task-modern-card {
-        display: flex; align-items: center; gap: 20px; padding: 20px;
-        background: white; border-radius: 24px; border: 1px solid var(--color-border);
-        transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-        position: relative;
-    }
-    .task-modern-card:hover:not(.is-done) { 
-        transform: translateY(-4px); 
-        border-color: var(--color-primary); 
-        box-shadow: 0 12px 30px rgba(255, 90, 95, 0.1); 
-    }
-    .task-modern-card.is-done { opacity: 0.6; background: #F9FAFB; border-color: transparent; }
+.page-subtitle { font-size: 14px; color: var(--ink-3); margin-top: 4px; text-transform: capitalize; }
+.progress-card { background: linear-gradient(135deg, #FFF2F2 0%, #FFFFFF 100%) !important; }
+.prog-track { height: 10px; background: var(--bg-3); border-radius: 99px; overflow: hidden; }
+.prog-fill { height: 100%; background: var(--grad-coral); border-radius: 99px; transition: width 0.8s cubic-bezier(0.34,1.56,0.64,1); box-shadow: 0 2px 8px rgba(255,107,107,0.4); }
 
-    .task-card-icon {
-        width: 56px; height: 56px; border-radius: 18px; background: #F8FAFC;
-        display: flex; align-items: center; justify-content: center; font-size: 24px;
-        color: var(--color-text-secondary); border: 1px solid #F1F5F9;
-    }
-    .is-done .task-card-icon { background: #E2E8F0; color: #94A3B8; }
+.tasks-grid { display: flex; flex-direction: column; gap: 12px; }
+.task-card {
+    display: flex; align-items: center; gap: 18px;
+    padding: 18px 22px;
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: 18px;
+    transition: var(--t-spring);
+    box-shadow: var(--shadow-xs);
+}
+.task-card:hover:not(.is-done) { transform: translateX(6px); border-color: var(--coral); box-shadow: var(--shadow-sm); }
+.task-card.is-done { opacity: 0.55; background: var(--bg-2); }
 
-    .task-card-content { flex: 1; }
-    .task-card-title { font-size: 17px; font-weight: 800; color: var(--color-text-primary); margin-bottom: 4px; }
-    .is-done .task-card-title { text-decoration: line-through; color: var(--color-text-muted); }
-    
-    .task-card-meta { display: flex; align-items: center; gap: 10px; }
-    .badge { padding: 4px 10px; border-radius: 10px; font-size: 11px; font-weight: 800; display: flex; align-items: center; gap: 5px; }
-    .badge-soft { background: #F1F5F9; color: #64748B; }
-    .badge-danger { background: #FEE2E2; color: #EF4444; }
-    .cat-name { font-size: 12px; font-weight: 600; color: var(--color-text-muted); }
-    .dot { color: #E2E8F0; font-size: 14px; }
+.tc-icon {
+    width: 54px; height: 54px; border-radius: 16px;
+    background: var(--coral-bg); color: var(--coral);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px; flex-shrink: 0;
+    border: 1.5px solid rgba(255,107,107,0.15);
+}
+.is-done .tc-icon { background: var(--bg-3); color: var(--ink-4); border-color: var(--border); }
+.tc-body { flex: 1; min-width: 0; }
+.tc-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; }
+.tc-title { font-size: 16px; font-weight: 800; color: var(--ink); }
+.is-done .tc-title { text-decoration: line-through; color: var(--ink-4); }
+.tc-pts { font-family: var(--font-display); font-size: 15px; font-weight: 800; color: var(--coral); white-space: nowrap; }
+.tc-meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 
-    .task-card-points { font-weight: 900; font-size: 20px; color: var(--color-primary); text-align: right; }
-    .task-card-points span { font-size: 10px; opacity: 0.5; display: block; margin-top: -4px; }
-
-    .btn-complete-modern {
-        background: var(--color-primary); color: white; border: none;
-        padding: 12px 24px; border-radius: 16px; font-weight: 800;
-        cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 10px;
-    }
-    .btn-complete-modern:hover { transform: scale(1.05); background: var(--color-primary-hover); }
-    
-    .done-check { font-size: 32px; color: #10B981; }
+.btn-complete {
+    background: var(--grad-mint); color: white;
+    border: none; padding: 10px 20px; border-radius: 12px;
+    font-weight: 700; font-size: 13px; cursor: pointer;
+    transition: var(--t-spring); display: flex; align-items: center; gap: 8px;
+    white-space: nowrap;
+}
+.btn-complete:hover { transform: scale(1.06); box-shadow: var(--shadow-mint); }
+.done-badge { display: flex; align-items: center; gap: 6px; color: var(--green); font-weight: 800; font-size: 14px; white-space: nowrap; }
 </style>

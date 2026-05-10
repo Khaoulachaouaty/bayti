@@ -6,50 +6,49 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Inscription – Bayti</title>
-    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
     <link rel="stylesheet" href="~/css/variables.css" asp-append-version="true"/>
     <style>
         *, *::before, *::after { box-sizing: border-box; margin:0; padding:0; }
-        body { min-height: 100vh; background: var(--bg); font-family: var(--font-body); display: grid; place-items: center; padding: 32px 20px; }
-
-        .register-card {
-            background: var(--surface);
-            width: 100%; max-width: 540px;
-            padding: 52px 48px;
-            border-radius: var(--r-xl);
-            box-shadow: var(--shadow-lg);
-            border: 1px solid var(--border);
+        body {
+            min-height: 100vh;
+            background: linear-gradient(145deg, #1A1D2E 0%, #252941 50%, #1E2340 100%);
+            font-family: var(--font-body);
+            display: grid; place-items: center; padding: 32px 20px;
         }
-
+        .register-card {
+            background: #13152B;
+            width: 100%; max-width: 560px;
+            padding: 52px 48px;
+            border-radius: 28px;
+            box-shadow: 0 30px 80px rgba(0,0,0,0.5);
+            border: 1px solid rgba(255,255,255,0.08);
+            position: relative; z-index: 1;
+        }
         .reg-header { text-align:center; margin-bottom:32px; }
-        .reg-brand { font-family:var(--font-display); font-size:26px; font-weight:900; color:var(--coral); letter-spacing:-0.5px; margin-bottom:14px; }
-        .reg-title { font-family:var(--font-display); font-size:24px; font-weight:900; color:var(--ink); letter-spacing:-0.5px; margin-bottom:6px; }
-        .reg-sub { font-size:14px; color:var(--ink-3); }
-
+        .reg-brand { font-family:var(--font-display); font-size:28px; font-weight:900; color:var(--coral); letter-spacing:-0.5px; margin-bottom:14px; }
+        .reg-title { font-family:var(--font-display); font-size:24px; font-weight:900; color:white; letter-spacing:-0.5px; margin-bottom:6px; }
+        .reg-sub { font-size:14px; color:rgba(255,255,255,0.45); }
         .form-group { margin-bottom:16px; }
-        .form-lbl { display:block; font-size:11px; font-weight:800; color:var(--ink-3); text-transform:uppercase; letter-spacing:0.8px; margin-bottom:8px; }
-        .form-inp { width:100%; padding:12px 16px; background:var(--bg-2); border:1.5px solid var(--border); border-radius:var(--r-sm); font-family:var(--font-body); font-size:14px; font-weight:500; color:var(--ink); transition:var(--t-fast); }
-        .form-inp:focus { outline:none; background:var(--surface); border-color:var(--coral); box-shadow:var(--coral-glow); }
-        .form-inp::placeholder { color:var(--ink-4); }
-
+        .form-lbl { display:block; font-size:11px; font-weight:800; color:rgba(255,255,255,0.45); text-transform:uppercase; letter-spacing:0.8px; margin-bottom:8px; }
+        .form-inp { width:100%; padding:13px 16px; background:rgba(255,255,255,0.06); border:1.5px solid rgba(255,255,255,0.10); border-radius:12px; font-family:var(--font-body); font-size:14px; font-weight:500; color:white; transition:var(--t-fast); }
+        .form-inp:focus { outline:none; background:rgba(255,255,255,0.09); border-color:rgba(255,107,107,0.6); box-shadow:var(--coral-glow); }
+        .form-inp::placeholder { color:rgba(255,255,255,0.25); }
         .form-row { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
-
-        /* Avatar picker */
         .av-section { margin-bottom:24px; }
-        .av-label { display:block; font-size:11px; font-weight:800; color:var(--ink-3); text-transform:uppercase; letter-spacing:0.8px; margin-bottom:10px; }
-        .av-grid { display:flex; flex-wrap:wrap; gap:8px; }
-        .av-opt { cursor:pointer; border-radius:var(--r-sm); border:2.5px solid transparent; padding:2px; transition:var(--t-spring); position:relative; }
-        .av-opt img { width:48px; height:48px; border-radius:var(--r-xs); display:block; }
-        .av-opt:hover { transform:scale(1.06); border-color:var(--border-strong); }
+        .av-label { display:block; font-size:11px; font-weight:800; color:rgba(255,255,255,0.45); text-transform:uppercase; letter-spacing:0.8px; margin-bottom:10px; }
+        .av-grid { display:flex; flex-wrap:wrap; gap:10px; }
+        .av-opt { cursor:pointer; border-radius:12px; border:2.5px solid rgba(255,255,255,0.1); padding:3px; transition:var(--t-spring); position:relative; }
+        .av-opt img { width:48px; height:48px; border-radius:10px; display:block; }
+        .av-opt:hover { transform:scale(1.06); border-color:rgba(255,255,255,0.3); }
         .av-opt.active { border-color:var(--coral); box-shadow:var(--coral-glow); transform:scale(1.1); }
-        .av-opt.active::after { content:'✓'; position:absolute; top:-7px; right:-7px; width:18px; height:18px; background:var(--coral); color:white; border-radius:50%; font-size:10px; font-weight:900; display:flex; align-items:center; justify-content:center; border:2px solid white; }
-
-        .btn-submit { width:100%; padding:14px; background:var(--grad-coral); color:white; border:none; border-radius:var(--r-md); font-family:var(--font-display); font-size:16px; font-weight:800; cursor:pointer; transition:var(--t-spring); box-shadow:var(--shadow-coral-sm); margin-bottom:16px; }
-        .btn-submit:hover { transform:translateY(-2px); box-shadow:var(--shadow-coral); }
-
-        .auth-foot { text-align:center; font-size:14px; color:var(--ink-3); font-weight:600; }
-        .auth-foot a { color:var(--coral); font-weight:800; }
+        .av-opt.active::after { content:'✓'; position:absolute; top:-6px; right:-6px; width:18px; height:18px; background:var(--coral); color:white; border-radius:50%; font-size:10px; font-weight:900; display:flex; align-items:center; justify-content:center; border:2px solid #13152B; }
+        .btn-submit { width:100%; padding:15px; background:var(--grad-coral); color:white; border:none; border-radius:14px; font-family:var(--font-display); font-size:16px; font-weight:800; cursor:pointer; transition:var(--t-spring); box-shadow:var(--shadow-coral-sm); margin-bottom:16px; }
+        .btn-submit:hover { transform:translateY(-3px); box-shadow:var(--shadow-coral); }
+        .auth-foot { text-align:center; font-size:14px; color:rgba(255,255,255,0.4); font-weight:600; }
+        .auth-foot a { color:var(--coral-light); font-weight:800; }
+        .val-error { background:rgba(255,107,107,0.12); color:#FF9494; border:1px solid rgba(255,107,107,0.25); border-radius:10px; padding:12px 16px; font-size:13px; font-weight:600; margin-bottom:16px; }
     </style>
 </head>
 <body>
@@ -61,7 +60,7 @@
         </div>
 
         <form asp-action="Register" method="post">
-            <div asp-validation-summary="All" style="color:var(--red);font-size:13px;margin-bottom:14px;font-weight:600;"></div>
+            <div asp-validation-summary="All" class="val-error"></div>
 
             <div class="form-group">
                 <label asp-for="FullName" class="form-lbl">Nom complet</label>

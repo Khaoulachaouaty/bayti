@@ -100,20 +100,21 @@
 <style>
     .grid-form-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; }
     .hidden { display: none; }
-    
-    .days-selector-premium { display: flex; gap: 8px; }
+    .days-selector-premium { display: flex; gap: 8px; flex-wrap: wrap; }
     .day-chip-premium {
-        width: 36px; height: 36px; border-radius: 12px;
-        border: 1px solid #E2E8F0; background: white;
-        font-size: 12px; font-weight: 800; color: #94A3B8;
+        width: 38px; height: 38px; border-radius: 12px;
+        border: 1.5px solid var(--border); background: var(--bg-2);
+        font-size: 12px; font-weight: 800; color: var(--ink-3);
         display: flex; align-items: center; justify-content: center;
-        cursor: pointer; transition: 0.2s;
+        cursor: pointer; transition: var(--t-spring);
     }
     .day-chip-premium.active {
-        background: var(--color-primary);
-        color: white; border-color: var(--color-primary);
-        box-shadow: 0 4px 10px rgba(255, 90, 95, 0.2);
+        background: var(--grad-coral); color: white;
+        border-color: var(--coral);
+        box-shadow: var(--shadow-coral-sm);
+        transform: scale(1.08);
     }
+    .day-chip-premium:hover:not(.active) { background: var(--coral-bg); border-color: var(--coral); color: var(--coral); }
 </style>
 
 @section Scripts {

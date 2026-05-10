@@ -1,107 +1,227 @@
 @model IEnumerable<Bayti.Models.Category>
+@using System.Security.Claims
 @{
     ViewData["Title"] = "Domaines d'action";
     var isAdmin = User.FindFirstValue("IsAdmin") == "True";
 }
 
-<div class="header-section mb-10 flex justify-between items-center">
-    <div>
-        <h1 class="page-title">Domaines & Catégories 🏷️</h1>
-        <p class="text-muted">Structurez les tâches de votre foyer par thématiques.</p>
-    </div>
-    @if (isAdmin) {
-        <a asp-action="Create" class="btn-premium">
-            <i class="fa-solid fa-plus mr-2"></i> Nouveau domaine
-        </a>
-    }
-</div>
+<div class="page-wrap">
 
-<div class="category-premium-grid">
-    @foreach (var item in Model) {
-        <div class="category-card-premium">
-            <div class="card-glow"></div>
-            <div class="category-content">
-                <div class="category-header-box">
-                    <div class="category-icon-wrapper">
-                        @if (item.Icon != null && item.Icon.StartsWith("fa-")) {
-                            <i class="fa-solid @item.Icon"></i>
-                        } else {
-                            <span>@(item.Icon ?? "✨")</span>
+    <!-- Header -->
+    <div class="page-header" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px; margin-bottom:32px;">
+        <div>
+            <h1 class="page-title">🏷️ Domaines & Catégories</h1>
+            <p style="font-size:14px; color:var(--ink-3); margin-top:4px;">Structurez les tâches de votre foyer par thématiques.</p>
+        </div>
+        @if (isAdmin) {
+            <a asp-action="Create" class="btn btn-mint">
+                <i class="fa-solid fa-plus"></i> Nouveau domaine
+            </a>
+        }
+    </div>
+
+    @if (!Model.Any()) {
+        <div class="empty-state">
+            <div class="empty-state-icon">🏷️</div>
+            <h3>Aucune catégorie</h3>
+            <p>Commencez par créer un domaine (ex: Cuisine, Salon, Jardin).</p>
+        </div>
+    } else {
+        <div class="cat-grid">
+            @foreach (var item in Model) {
+                <div class="cat-card">
+                    <div class="cat-card-inner">
+                        <div class="cat-header">
+                            <div class="cat-icon-box">
+                                @if (item.Icon != null && item.Icon.StartsWith("fa-")) {
+                                    <i class="fa-solid @item.Icon"></i>
+                                } else {
+                                    <span>@(item.Icon ?? "✨")</span>
+                                }
+                            </div>
+                            <div class="cat-stats">
+                                <span class="cat-count">@(item.TaskTemplates?.Count ?? 0)</span>
+                                <span class="cat-count-label">missions</span>
+                            </div>
+                        </div>
+                        
+                        <div class="cat-info">
+                            <h3 class="cat-name">@item.Name</h3>
+                            <p class="cat-desc">@(string.IsNullOrEmpty(item.Description) ? "Gestion et organisation des tâches quotidiennes." : item.Description)</p>
+                        </div>
+
+                        @if (isAdmin) {
+                            <div class="cat-actions">
+                                <a asp-action="Edit" asp-route-id="@item.Id" class="cat-action-btn cat-edit" title="Modifier">
+                                    <i class="fa-solid fa-pen-to-square"></i>
+                                </a>
+                                <form asp-action="Delete" asp-route-id="@item.Id" method="post" onsubmit="return confirm('Supprimer ce domaine ?')" style="margin:0">
+                                    <button type="submit" class="cat-action-btn cat-delete" title="Supprimer">
+                                        <i class="fa-solid fa-trash-can"></i>
+                                    </button>
+                                </form>
+                            </div>
                         }
                     </div>
-                    <div class="category-stats-pill">
-                        @(item.TaskTemplates?.Count ?? 0) <i class="fa-solid fa-bolt ml-1"></i>
-                    </div>
                 </div>
-                
-                <h3 class="category-name">@item.Name</h3>
-                <p class="category-description">@(string.IsNullOrEmpty(item.Description) ? "Gestion et organisation des tâches quotidiennes." : item.Description)</p>
-                
-                @if (isAdmin) {
-                    <div class="category-actions-row">
-                        <a asp-action="Edit" asp-route-id="@item.Id" class="cat-btn edit">
-                            <i class="fa-solid fa-pen"></i>
-                        </a>
-                        <form asp-action="Delete" asp-route-id="@item.Id" method="post" onsubmit="return confirm('Supprimer ce domaine ?')" style="display:inline;">
-                            <button type="submit" class="cat-btn delete">
-                                <i class="fa-solid fa-trash-can"></i>
-                            </button>
-                        </form>
-                    </div>
-                }
-            </div>
+            }
         </div>
     }
+
 </div>
 
-@if (!Model.Any()) {
-    <div class="empty-state-dashboard" style="padding: 100px 0;">
-        <div style="font-size: 64px; opacity: 0.1; margin-bottom: 20px;"><i class="fa-solid fa-tags"></i></div>
-        <h2 style="font-weight: 850; color: var(--color-text-primary); margin-bottom: 8px;">Aucune catégorie</h2>
-        <p class="text-muted">Commencez par créer un domaine (ex: Cuisine, Salon, Jardin).</p>
-    </div>
+<style>
+.cat-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 24px;
 }
 
-<style>
-    .page-title { font-size: 32px; font-weight: 850; color: var(--color-text-primary); letter-spacing: -1px; }
-    .category-premium-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 30px; }
-    
-    .category-card-premium {
-        background: white; border-radius: 36px; border: 1px solid var(--color-border);
-        padding: 30px; position: relative; overflow: hidden;
-        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    }
-    .category-card-premium:hover { transform: translateY(-10px); border-color: var(--color-primary); box-shadow: 0 20px 40px rgba(255, 90, 95, 0.1); }
-    
-    .card-glow { position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle, rgba(255, 90, 95, 0.05) 0%, transparent 70%); opacity: 0; transition: 0.4s; pointer-events: none; }
-    .category-card-premium:hover .card-glow { opacity: 1; }
+.cat-card {
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: 28px;
+    padding: 24px;
+    transition: var(--t-spring);
+    position: relative;
+    box-shadow: var(--shadow-xs);
+    overflow: hidden;
+}
 
-    .category-content { position: relative; z-index: 2; height: 100%; display: flex; flex-direction: column; }
-    
-    .category-header-box { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; }
-    .category-icon-wrapper {
-        width: 60px; height: 60px; background: var(--color-primary-bg); color: var(--color-primary);
-        border-radius: 18px; display: flex; align-items: center; justify-content: center; font-size: 26px;
-        box-shadow: 0 8px 16px rgba(255, 90, 95, 0.1);
-    }
-    .category-stats-pill { background: #F1F5F9; color: #64748B; padding: 6px 12px; border-radius: 100px; font-size: 11px; font-weight: 800; }
+.cat-card::before {
+    content: '';
+    position: absolute;
+    top: -20px; right: -20px;
+    width: 100px; height: 100px;
+    background: var(--mint-bg);
+    border-radius: 50%;
+    z-index: 0;
+    transition: var(--t-base);
+    opacity: 0.5;
+}
 
-    .category-name { font-size: 22px; font-weight: 850; color: var(--color-text-primary); margin-bottom: 10px; }
-    .category-description { font-size: 14px; color: var(--color-text-secondary); line-height: 1.6; flex: 1; margin-bottom: 24px; }
+.cat-card:hover {
+    transform: translateY(-8px);
+    border-color: var(--mint);
+    box-shadow: 0 20px 40px rgba(0, 201, 167, 0.12);
+}
 
-    .category-actions-row { display: flex; gap: 10px; }
-    .cat-btn {
-        width: 44px; height: 44px; border-radius: 14px; display: flex; align-items: center; justify-content: center;
-        background: #F8FAFC; color: #94A3B8; border: 1px solid #F1F5F9; transition: 0.2s; cursor: pointer; text-decoration: none; font-size: 14px;
-    }
-    .cat-btn:hover { transform: scale(1.1); color: var(--color-text-primary); background: white; }
-    .cat-btn.edit:hover { color: #2563EB; background: #EFF6FF; border-color: #DBEAFE; }
-    .cat-btn.delete:hover { color: #E11D48; background: #FFF1F2; border-color: #FECDD3; }
+.cat-card:hover::before {
+    transform: scale(1.5);
+    background: var(--mint-light);
+    opacity: 0.2;
+}
 
-    .btn-premium {
-        padding: 12px 24px; border-radius: 16px; background: var(--color-primary); color: white;
-        font-weight: 800; font-size: 14px; transition: 0.3s; display: inline-flex; align-items: center;
-        box-shadow: 0 8px 20px rgba(255, 90, 95, 0.25); text-decoration: none;
-    }
-    .btn-premium:hover { transform: translateY(-3px); box-shadow: 0 12px 25px rgba(255, 90, 95, 0.35); color: white; }
+.cat-card-inner {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.cat-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 20px;
+}
+
+.cat-icon-box {
+    width: 54px; height: 54px;
+    background: var(--mint-bg);
+    color: var(--mint);
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    border: 1.5px solid rgba(0, 201, 167, 0.15);
+    transition: var(--t-base);
+}
+
+.cat-card:hover .cat-icon-box {
+    background: var(--mint);
+    color: white;
+    transform: rotate(-5deg) scale(1.1);
+}
+
+.cat-stats {
+    text-align: right;
+    display: flex;
+    flex-direction: column;
+}
+
+.cat-count {
+    font-family: var(--font-display);
+    font-size: 20px;
+    font-weight: 900;
+    color: var(--ink);
+    line-height: 1;
+}
+
+.cat-count-label {
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--ink-4);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.cat-info {
+    flex: 1;
+}
+
+.cat-name {
+    font-family: var(--font-display);
+    font-size: 19px;
+    font-weight: 850;
+    color: var(--ink);
+    margin-bottom: 8px;
+}
+
+.cat-desc {
+    font-size: 13.5px;
+    color: var(--ink-3);
+    line-height: 1.5;
+    margin-bottom: 20px;
+}
+
+.cat-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: auto;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+}
+
+.cat-action-btn {
+    flex: 1;
+    height: 40px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1.5px solid var(--border);
+    background: var(--bg-2);
+    color: var(--ink-3);
+    transition: var(--t-fast);
+    cursor: pointer;
+    font-size: 14px;
+    text-decoration: none;
+}
+
+.cat-edit:hover {
+    background: var(--blue-bg);
+    color: var(--blue);
+    border-color: rgba(74, 144, 226, 0.3);
+    transform: translateY(-2px);
+}
+
+.cat-delete:hover {
+    background: var(--red-bg);
+    color: var(--red);
+    border-color: rgba(255, 107, 107, 0.3);
+    transform: translateY(-2px);
+}
 </style>

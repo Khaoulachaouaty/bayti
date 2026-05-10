@@ -1,44 +1,61 @@
-@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
 
 :root {
-    /* ── PALETTE BAYTI (tirée du logo) ─────────────────── */
-    /* Corail Saumon du logo */
-    --coral:            #F76B6B;
+    /* ── PALETTE BAYTI MAISON ─────────────────────────── */
+    /* Coral chaud - accent principal */
+    --coral:            #FF6B6B;
     --coral-dark:       #E85555;
-    --coral-light:      #FF8A8A;
-    --coral-bg:         #FFF0F0;
-    --coral-glow:       0 0 0 4px rgba(247, 107, 107, 0.15);
+    --coral-light:      #FF9494;
+    --coral-bg:         #FFF2F2;
+    --coral-glow:       0 0 0 4px rgba(255, 107, 107, 0.18);
 
-    /* Fond Doux – ambiance maison propre */
-    --bg:               #FAFAFA;
-    --bg-2:             #F4F4F6;
+    /* Menthe fraîche - accent secondaire */
+    --mint:             #00C9A7;
+    --mint-dark:        #00A889;
+    --mint-light:       #4DDEC6;
+    --mint-bg:          #E8FBF8;
+    --mint-glow:        0 0 0 4px rgba(0, 201, 167, 0.18);
+
+    /* Bleu ciel doux */
+    --sky:              #4ECDC4;
+    --sky-bg:           #EBF9F8;
+
+    /* Lavande */
+    --lavender:         #A78BFA;
+    --lavender-bg:      #F3EFFE;
+
+    /* Fond - blanc cassé chaleureux */
+    --bg:               #F7F8FC;
+    --bg-2:             #EFF1F8;
+    --bg-3:             #E8EAF4;
     --surface:          #FFFFFF;
+    --surface-2:        #FAFBFF;
 
-    /* Neutrals – Navy foncé comme le texte du logo */
-    --ink:              #1C1C28;
-    --ink-2:            #3D3D4E;
-    --ink-3:            #6B6B80;
-    --ink-4:            #A0A0B5;
+    /* Neutrals */
+    --ink:              #1A1D2E;
+    --ink-2:            #363B55;
+    --ink-3:            #6B7094;
+    --ink-4:            #A0A5C0;
 
-    /* Bordures douces */
-    --border:           #EBEBF0;
-    --border-strong:    #D5D5DF;
+    /* Bordures */
+    --border:           #E8EAF4;
+    --border-strong:    #CDD0E8;
 
-    /* Accents secondaires – Chaleur Maison */
+    /* Accents status */
     --amber:            #F5A623;
     --amber-bg:         #FFF8EC;
-    --green:            #34C47C;
-    --green-bg:         #EDFAF4;
+    --green:            #2ECC87;
+    --green-bg:         #EAFAF3;
     --blue:             #4A90E2;
     --blue-bg:          #EDF4FD;
-    --purple:           #9B5CE5;
-    --purple-bg:        #F4EFFE;
-    --red:              #F44336;
-    --red-bg:           #FFF0EF;
+    --purple:           #A78BFA;
+    --purple-bg:        #F3EFFE;
+    --red:              #FF6B6B;
+    --red-bg:           #FFF2F2;
 
     /* ── TYPOGRAPHY ──────────────────────────────────── */
     --font-display: 'Nunito', sans-serif;
-    --font-body:    'Inter', sans-serif;
+    --font-body:    'Plus Jakarta Sans', sans-serif;
 
     /* ── SPACING ─────────────────────────────────────── */
     --s1:  4px;
@@ -61,25 +78,34 @@
     --r-full: 9999px;
 
     /* ── SHADOWS ──────────────────────────────────────── */
-    --shadow-xs:    0 1px 3px rgba(28,28,40,0.06), 0 1px 2px rgba(28,28,40,0.04);
-    --shadow-sm:    0 4px 12px rgba(28,28,40,0.07), 0 1px 3px rgba(28,28,40,0.05);
-    --shadow-md:    0 8px 24px rgba(28,28,40,0.09), 0 2px 8px rgba(28,28,40,0.05);
-    --shadow-lg:    0 16px 40px rgba(28,28,40,0.11), 0 4px 12px rgba(28,28,40,0.06);
-    --shadow-coral: 0 8px 24px rgba(247,107,107,0.30);
-    --shadow-coral-sm: 0 4px 14px rgba(247,107,107,0.22);
+    --shadow-xs:     0 1px 4px rgba(26,29,46,0.06), 0 1px 2px rgba(26,29,46,0.04);
+    --shadow-sm:     0 4px 16px rgba(26,29,46,0.08), 0 1px 4px rgba(26,29,46,0.04);
+    --shadow-md:     0 8px 28px rgba(26,29,46,0.10), 0 2px 8px rgba(26,29,46,0.06);
+    --shadow-lg:     0 20px 48px rgba(26,29,46,0.13), 0 4px 14px rgba(26,29,46,0.07);
+    --shadow-coral:  0 10px 30px rgba(255,107,107,0.35);
+    --shadow-coral-sm: 0 4px 16px rgba(255,107,107,0.25);
+    --shadow-mint:   0 8px 24px rgba(0,201,167,0.28);
 
     /* ── GRADIENTS ────────────────────────────────────── */
-    --grad-coral:  linear-gradient(135deg, #F76B6B 0%, #FF9494 100%);
-    --grad-warm:   linear-gradient(135deg, #F5A623 0%, #F7D070 100%);
-    --grad-hero:   linear-gradient(140deg, #F76B6B 0%, #FF8A8A 55%, #FFB3A7 100%);
-    --grad-subtle: linear-gradient(180deg, #FFFFFF 0%, #FAFAFA 100%);
+    --grad-coral:   linear-gradient(135deg, #FF6B6B 0%, #FF9494 100%);
+    --grad-mint:    linear-gradient(135deg, #00C9A7 0%, #4DDEC6 100%);
+    --grad-warm:    linear-gradient(135deg, #F5A623 0%, #FFCA6B 100%);
+    --grad-hero:    linear-gradient(145deg, #FF6B6B 0%, #FF8E8E 40%, #FF6B9D 70%, #C44FFF 100%);
+    --grad-sidebar: linear-gradient(180deg, #1A1D2E 0%, #252941 100%);
+    --grad-card:    linear-gradient(140deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.95) 100%);
+    --grad-subtle:  linear-gradient(180deg, #FFFFFF 0%, #F7F8FC 100%);
+    --grad-teal:    linear-gradient(135deg, #4ECDC4 0%, #00C9A7 100%);
 
     /* ── LAYOUT ───────────────────────────────────────── */
-    --sidebar-w: 265px;
-    --max-w:     1180px;
+    --sidebar-w: 270px;
+    --max-w:     1200px;
 
     /* ── TRANSITIONS ──────────────────────────────────── */
-    --t-fast:   0.16s cubic-bezier(0.2,0,0,1);
-    --t-base:   0.26s cubic-bezier(0.2,0,0,1);
-    --t-spring: 0.38s cubic-bezier(0.34,1.56,0.64,1);
+    --t-fast:   0.15s cubic-bezier(0.2,0,0,1);
+    --t-base:   0.25s cubic-bezier(0.2,0,0,1);
+    --t-spring: 0.4s cubic-bezier(0.34,1.56,0.64,1);
+
+    /* ── GLASS EFFECT ─────────────────────────────────── */
+    --glass: rgba(255,255,255,0.70);
+    --glass-border: rgba(255,255,255,0.50);
 }

@@ -7,12 +7,27 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] – Bayti</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <link rel="stylesheet" href="~/css/variables.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 </head>
 <body>
+
+<!-- ═══════════ FLOATING BUBBLES ═══════════ -->
+<div class="bubbles-bg" aria-hidden="true">
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+</div>
+
 <div class="bayti-app">
 
     <!-- ═══════════════ SIDEBAR ═══════════════ -->
@@ -21,11 +36,11 @@
         <!-- Brand -->
         <div class="sb-brand">
             <div class="sb-logo-icon">
-                <i class="fa-solid fa-house"></i>
+                <i class="fa-solid fa-house-chimney"></i>
             </div>
             <div>
                 <div class="sb-name">Bayti</div>
-                <div class="sb-tagline">COLOC' ZEN</div>
+                <div class="sb-tagline">Coloc' Zen ✨</div>
             </div>
         </div>
 
@@ -41,11 +56,11 @@
         }
         <div class="sb-stats">
             <div class="sb-stat-card">
-                <span class="sb-stat-label">POINTS</span>
-                <span class="sb-stat-val"><i class="fa-solid fa-star" style="color:var(--coral);font-size:12px;"></i> @pts</span>
+                <span class="sb-stat-label">⭐ Points</span>
+                <span class="sb-stat-val">@pts</span>
             </div>
             <div class="sb-stat-card">
-                <span class="sb-stat-label">ACCÈS</span>
+                <span class="sb-stat-label">🔑 Code</span>
                 <span class="sb-stat-val code">@joinCode</span>
             </div>
         </div>
@@ -56,17 +71,17 @@
             <div class="sb-section-label">Principal</div>
             <a class="sb-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Home" ? "active" : "")"
                asp-controller="Home" asp-action="Index">
-                <i class="fa-regular fa-table-columns sb-link-icon"></i>
+                <i class="fa-solid fa-chart-pie sb-link-icon"></i>
                 <span>Tableau de bord</span>
             </a>
             <a class="sb-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Tasks" ? "active" : "")"
                asp-controller="Tasks" asp-action="Index">
-                <i class="fa-regular fa-square-check sb-link-icon"></i>
+                <i class="fa-solid fa-broom sb-link-icon"></i>
                 <span>Mes tâches</span>
             </a>
             <a class="sb-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Planning" ? "active" : "")"
-               asp-controller="Tasks" asp-action="Index">
-                <i class="fa-regular fa-calendar sb-link-icon"></i>
+               asp-controller="Planning" asp-action="Index">
+                <i class="fa-solid fa-calendar-days sb-link-icon"></i>
                 <span>Planning</span>
             </a>
             @{
@@ -76,7 +91,7 @@
             }
             <a class="sb-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Notifications" ? "active" : "")"
                asp-controller="Notifications" asp-action="Index">
-                <i class="fa-regular fa-bell sb-link-icon"></i>
+                <i class="fa-solid fa-bell sb-link-icon"></i>
                 <span>Notifications</span>
                 @if (unread > 0) {
                     <span class="sb-badge">@unread</span>
@@ -86,7 +101,7 @@
             <div class="sb-section-label" style="margin-top:8px;">Colocation</div>
             <a class="sb-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Colocation" ? "active" : "")"
                asp-controller="Colocation" asp-action="Index">
-                <i class="fa-solid fa-user-group sb-link-icon"></i>
+                <i class="fa-solid fa-people-roof sb-link-icon"></i>
                 <span>Membres</span>
             </a>
             <a class="sb-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Categories" ? "active" : "")"
@@ -101,8 +116,8 @@
             </a>
             <a class="sb-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Rewards" ? "active" : "")"
                asp-controller="Rewards" asp-action="Index">
-                <i class="fa-solid fa-bag-shopping sb-link-icon"></i>
-                <span>Boutique</span>
+                <i class="fa-solid fa-gift sb-link-icon"></i>
+                <span>Boutique 🎁</span>
             </a>
 
         </nav>
@@ -117,7 +132,7 @@
                 <img src="@avSrc" class="sb-user-av" alt="avatar" />
                 <div class="sb-user-info">
                     <span class="sb-user-name">@(User.Identity?.Name?.Split('@')[0] ?? "Utilisateur")</span>
-                    <span class="sb-user-role">Membre de la tribu</span>
+                    <span class="sb-user-role">Membre de la tribu 🏠</span>
                 </div>
             </a>
             <a asp-controller="Account" asp-action="Logout" class="sb-logout">

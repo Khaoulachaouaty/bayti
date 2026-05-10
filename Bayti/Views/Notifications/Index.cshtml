@@ -4,136 +4,96 @@
     var unreadCount = Model.Count(n => !n.IsRead);
 }
 
-<div class="header-section mb-10">
-    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+<div class="page-wrap">
+
+    <!-- Header -->
+    <div class="page-header" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px;">
         <div>
-            <h1 class="page-title">Mes Notifications</h1>
-            <p class="page-subtitle">Restez informé de tout ce qui se passe dans la colocation.</p>
+            <h1 class="page-title">🔔 Notifications</h1>
+            <p style="font-size:14px;color:var(--ink-3);margin-top:4px;">
+                @if (unreadCount > 0) { <text><span style="color:var(--coral);font-weight:700;">@unreadCount non lue(s)</span> – </text> }
+                Restez informé de votre colocation.
+            </p>
         </div>
-        <div class="flex gap-4">
-            <a asp-action="TestNotification" class="btn" style="background: white; border: 1px solid var(--color-border); border-radius: 12px; font-weight: 700;">
-                <i class="fa-solid fa-vial mr-2"></i> Tester
-            </a>
-            @if (unreadCount > 0)
-            {
+        <div style="display:flex;gap:10px;">
+            @if (unreadCount > 0) {
                 <form asp-action="MarkAllAsRead" method="post">
-                    <button type="submit" class="btn-premium" style="background: #F1F5F9; color: var(--color-text-primary);">
-                        <i class="fa-solid fa-check-double mr-2"></i>
-                        Tout marquer comme lu
+                    <button type="submit" class="btn btn-ghost">
+                        <i class="fa-solid fa-check-double"></i> Tout marquer lu
                     </button>
                 </form>
             }
         </div>
     </div>
-</div>
 
-@if (!Model.Any())
-{
-    <div class="empty-state-fine">
-        <div class="empty-illustration">
-            <i class="fa-regular fa-bell-slash"></i>
+    @if (!Model.Any()) {
+        <div class="empty-state">
+            <div class="empty-state-icon">🔕</div>
+            <h3>Tout est calme !</h3>
+            <p>Aucune notification pour le moment.</p>
         </div>
-        <p>Aucune notification pour le moment. Tout est calme !</p>
-    </div>
-}
-else
-{
-    <div class="notifications-list flex flex-col gap-4">
-        @foreach (var notif in Model)
-        {
-            <div class="notif-card @(notif.IsRead ? "read" : "unread")">
-                <div class="notif-icon-container">
-                    @if (notif.Type == "Warning" || notif.Type == "Penalty")
-                    {
-                        <div class="notif-icon danger"><i class="fa-solid fa-triangle-exclamation"></i></div>
+    } else {
+        <div class="notif-list">
+            @foreach (var notif in Model) {
+                <div class="notif-card @(notif.IsRead ? "is-read" : "is-unread")">
+                    @if (!notif.IsRead) {
+                        <div class="notif-dot"></div>
                     }
-                    else if (notif.Type == "Success")
-                    {
-                        <div class="notif-icon success"><i class="fa-solid fa-check"></i></div>
-                    }
-                    else
-                    {
-                        <div class="notif-icon info"><i class="fa-solid fa-info"></i></div>
-                    }
-                </div>
-                
-                <div class="notif-content">
-                    <div class="notif-header">
-                        <h4 class="notif-title">@notif.Title</h4>
-                        <span class="notif-time">@notif.CreatedAt.ToString("dd/MM/yyyy HH:mm")</span>
+                    <div class="notif-icon-wrap @(notif.Type == "Warning" || notif.Type == "Penalty" ? "ni-danger" : notif.Type == "Success" ? "ni-success" : "ni-info")">
+                        @if (notif.Type == "Warning" || notif.Type == "Penalty") {
+                            <i class="fa-solid fa-triangle-exclamation"></i>
+                        } else if (notif.Type == "Success") {
+                            <i class="fa-solid fa-circle-check"></i>
+                        } else {
+                            <i class="fa-solid fa-bell"></i>
+                        }
                     </div>
-                    <p class="notif-msg">@notif.Message</p>
-                </div>
-                
-                <div class="notif-actions">
-                    @if (!notif.IsRead)
-                    {
+                    <div class="notif-body">
+                        <div class="notif-top">
+                            <h4 class="notif-title">@notif.Title</h4>
+                            <span class="notif-time">@notif.CreatedAt.ToString("dd/MM HH:mm")</span>
+                        </div>
+                        <p class="notif-msg">@notif.Message</p>
+                    </div>
+                    @if (!notif.IsRead) {
                         <form asp-action="MarkAsRead" asp-route-id="@notif.Id" method="post">
-                            <button type="submit" class="btn-mark-read" title="Marquer comme lu">
+                            <button type="submit" class="notif-read-btn" title="Marquer comme lu">
                                 <i class="fa-solid fa-check"></i>
                             </button>
                         </form>
                     }
                 </div>
-                
-                @if (!notif.IsRead)
-                {
-                    <div class="unread-dot"></div>
-                }
-            </div>
-        }
-    </div>
-}
+            }
+        </div>
+    }
+</div>
 
 <style>
-    .notif-card {
-        background: white;
-        border-radius: 20px;
-        padding: 20px;
-        display: flex;
-        gap: 20px;
-        align-items: flex-start;
-        border: 1px solid #F1F5F9;
-        transition: all 0.3s ease;
-        position: relative;
-    }
-    
-    .notif-card.unread {
-        border-color: rgba(212, 165, 138, 0.3);
-        background: #FFFAF8;
-        box-shadow: 0 4px 15px rgba(212, 165, 138, 0.05);
-    }
-    
-    .notif-card.read {
-        opacity: 0.7;
-    }
+.notif-list { display: flex; flex-direction: column; gap: 10px; }
+.notif-card {
+    display: flex; align-items: center; gap: 16px;
+    padding: 18px 22px; border-radius: 18px;
+    background: var(--surface); border: 1.5px solid var(--border);
+    box-shadow: var(--shadow-xs); transition: var(--t-fast);
+    position: relative;
+}
+.notif-card:hover { box-shadow: var(--shadow-sm); transform: translateX(4px); }
+.notif-card.is-unread { background: linear-gradient(135deg, #FFF8F5, #FFFFFF); border-color: rgba(255,107,107,0.22); }
+.notif-card.is-read { opacity: 0.65; }
 
-    .notif-icon-container { flex-shrink: 0; }
-    .notif-icon {
-        width: 44px; height: 44px; border-radius: 14px;
-        display: flex; align-items: center; justify-content: center;
-        font-size: 18px;
-    }
-    .notif-icon.info { background: var(--color-primary-bg); color: var(--color-primary); }
-    .notif-icon.danger { background: var(--color-danger-bg); color: var(--color-danger); }
-    .notif-icon.success { background: var(--color-success-bg); color: var(--color-success); }
+.notif-dot { position: absolute; left: -5px; top: 50%; transform: translateY(-50%); width: 10px; height: 10px; background: var(--coral); border-radius: 50%; box-shadow: 0 0 0 3px var(--coral-bg); }
 
-    .notif-content { flex-grow: 1; min-width: 0; }
-    .notif-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 6px; }
-    .notif-title { font-size: 16px; font-weight: 800; color: var(--color-text-primary); margin: 0; }
-    .notif-time { font-size: 11px; font-weight: 700; color: #94A3B8; }
-    .notif-msg { font-size: 14px; color: var(--color-text-secondary); line-height: 1.5; margin: 0; }
+.notif-icon-wrap { width: 46px; height: 46px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+.ni-info    { background: var(--coral-bg); color: var(--coral); }
+.ni-danger  { background: var(--amber-bg); color: var(--amber); }
+.ni-success { background: var(--green-bg); color: var(--green); }
 
-    .notif-actions { display: flex; align-items: center; }
-    .btn-mark-read {
-        width: 36px; height: 36px; border-radius: 10px; border: none; cursor: pointer;
-        background: white; color: var(--color-primary); box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-        transition: all 0.2s; display: flex; align-items: center; justify-content: center;
-    }
-    .btn-mark-read:hover { background: var(--color-primary); color: white; transform: scale(1.05); }
+.notif-body { flex: 1; min-width: 0; }
+.notif-top { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 4px; }
+.notif-title { font-size: 15px; font-weight: 800; color: var(--ink); margin: 0; }
+.notif-time { font-size: 11px; font-weight: 700; color: var(--ink-4); white-space: nowrap; }
+.notif-msg { font-size: 13px; color: var(--ink-3); line-height: 1.5; margin: 0; }
 
-    .unread-dot {
-        position: absolute; top: 20px; left: -4px; width: 8px; height: 8px;
-        background: var(--color-primary); border-radius: 50%;
-    }
+.notif-read-btn { width: 36px; height: 36px; border-radius: 10px; border: 1.5px solid var(--border); background: var(--bg-2); color: var(--green); font-size: 13px; cursor: pointer; transition: var(--t-spring); display: flex; align-items: center; justify-content: center; }
+.notif-read-btn:hover { background: var(--green); color: white; border-color: var(--green); transform: scale(1.12); }
 </style>

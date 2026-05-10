@@ -3,170 +3,139 @@
     ViewData["Title"] = "Mon Profil";
 }
 
-<div class="profile-premium-container pt-10">
-    <div class="profile-header mb-12">
-        <h1 class="page-title">Mon Profil ✨</h1>
-        <p class="text-muted">Personnalisez votre identité au sein de la tribu.</p>
+<div class="page-wrap">
+    
+    <div class="page-header mb-8">
+        <h1 class="page-title">👤 Mon Profil</h1>
+        <p style="font-size:14px; color:var(--ink-3); margin-top:4px;">Gérez vos informations personnelles et votre avatar.</p>
     </div>
 
-    @if (TempData["Success"] != null)
-    {
-        <div class="alert alert-success mb-8 p-4 flex items-center gap-3" style="background: #ECFCCB; border: 1px solid #BEF264; border-radius: 20px; color: #3F6212; font-weight: 700;">
-            <div style="width: 32px; height: 32px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px;">
-                <i class="fa-solid fa-check"></i>
-            </div>
-            @TempData["Success"]
-        </div>
+    @if (TempData["Success"] != null) {
+        <div class="alert alert-success"><i class="fa-solid fa-circle-check"></i> @TempData["Success"]</div>
     }
 
-    <form asp-action="Profile" method="post" class="profile-layout">
+    <form asp-action="Profile" method="post">
         <div asp-validation-summary="ModelOnly" class="text-danger mb-4"></div>
         <input type="hidden" asp-for="AvatarUrl" id="avatar-input" />
 
-        <!-- Left: Avatar & Bio -->
-        <div class="profile-sidebar-card">
-            <div class="avatar-main-selection">
-                <div class="main-avatar-wrapper">
-                    <img id="profile-preview" src="@Url.Content(Model.AvatarUrl ?? "/images/avatars/avatar1.png")" alt="Avatar" />
-                    <div class="edit-badge"><i class="fa-solid fa-camera"></i></div>
+        <div class="profile-grid">
+            <!-- Sidebar: Avatar & Identity -->
+            <div class="profile-side">
+                <div class="card card-p text-center">
+                    <div class="profile-avatar-main">
+                        <img id="profile-preview" src="@Url.Content(Model.AvatarUrl ?? "/images/avatars/avatar1.png")" alt="Avatar" />
+                        <div class="avatar-edit-badge"><i class="fa-solid fa-camera"></i></div>
+                    </div>
+                    <h2 class="profile-name-display mt-6">@Model.FullName</h2>
+                    <p class="profile-email-display">@Model.Email</p>
+
+                    <div class="avatar-selection-zone mt-8">
+                        <label class="form-label-premium text-center mb-4">Changer d'avatar</label>
+                        <div class="avatar-picker-grid">
+                            @{
+                                var avatars = new List<string> { 
+                                    "/images/avatars/avatar1.png", "/images/avatars/avatar2.png", "/images/avatars/avatar3.png", 
+                                    "/images/avatars/avatar4.png", "/images/avatars/avatar5.png",
+                                    "https://api.dicebear.com/7.x/avataaars/png?seed=Felix",
+                                    "https://api.dicebear.com/7.x/avataaars/png?seed=Aneka",
+                                    "https://api.dicebear.com/7.x/avataaars/png?seed=Milo",
+                                    "https://api.dicebear.com/7.x/avataaars/png?seed=Zoe"
+                                };
+                            }
+                            @foreach (var url in avatars) {
+                                var resolvedUrl = url.StartsWith("http") ? url : Url.Content(url);
+                                <div class="avatar-item @(Model.AvatarUrl == url ? "is-active" : "")" onclick="selectAvatar('@resolvedUrl', this, '@url')">
+                                    <img src="@resolvedUrl" alt="Avatar" />
+                                    <div class="avatar-check"><i class="fa-solid fa-check"></i></div>
+                                </div>
+                            }
+                        </div>
+                    </div>
                 </div>
-                <h2 class="user-display-name mt-4">@Model.FullName</h2>
-                <p class="user-display-email">@Model.Email</p>
             </div>
 
-            <div class="avatar-grid-selector mt-10">
-                <label class="section-label-sm mb-4">Choisir un nouvel avatar</label>
-                <div class="avatars-scrollable">
-                    @{
-                        var avatars = new List<string> { 
-                            "/images/avatars/avatar1.png", 
-                            "/images/avatars/avatar2.png", 
-                            "/images/avatars/avatar3.png", 
-                            "/images/avatars/avatar4.png", 
-                            "/images/avatars/avatar5.png",
-                            "https://api.dicebear.com/7.x/avataaars/png?seed=Felix",
-                            "https://api.dicebear.com/7.x/avataaars/png?seed=Aneka",
-                            "https://api.dicebear.com/7.x/avataaars/png?seed=Milo",
-                            "https://api.dicebear.com/7.x/avataaars/png?seed=Zoe",
-                            "https://api.dicebear.com/7.x/avataaars/png?seed=Jasper",
-                            "https://api.dicebear.com/7.x/avataaars/png?seed=Luna"
-                        };
-                    }
-                    <div class="avatars-flex">
-                        @foreach (var url in avatars)
-                        {
-                            var resolvedUrl = url.StartsWith("http") ? url : Url.Content(url);
-                            <div class="avatar-option-premium @(Model.AvatarUrl == url ? "active" : "")" onclick="selectAvatar('@resolvedUrl', this, '@url')">
-                                <img src="@resolvedUrl" alt="Avatar Option" />
-                                <div class="mini-check"><i class="fa-solid fa-check"></i></div>
+            <!-- Main: Forms -->
+            <div class="profile-main">
+                <div class="card card-p mb-6">
+                    <h3 class="section-title mb-6" style="font-size:18px;">🆔 Informations personnelles</h3>
+                    <div class="form-grid">
+                        <div class="form-group-premium">
+                            <label asp-for="FullName" class="form-label-premium">Nom complet</label>
+                            <div class="input-icon-wrap">
+                                <i class="fa-solid fa-user"></i>
+                                <input asp-for="FullName" class="input-premium" placeholder="Votre nom..." />
                             </div>
-                        }
+                            <span asp-validation-for="FullName" class="text-danger"></span>
+                        </div>
+                        <div class="form-group-premium">
+                            <label asp-for="Email" class="form-label-premium">Adresse email</label>
+                            <div class="input-icon-wrap">
+                                <i class="fa-solid fa-envelope"></i>
+                                <input asp-for="Email" class="input-premium" placeholder="email@exemple.com" />
+                            </div>
+                            <span asp-validation-for="Email" class="text-danger"></span>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </div>
 
-        <!-- Right: Fields -->
-        <div class="profile-main-fields">
-            <div class="form-section-card">
-                <h3 class="section-title-sm mb-8">Informations Personnelles</h3>
-                
-                <div class="form-grid-2">
-                    <div class="field-group">
-                        <label asp-for="FullName">Nom complet</label>
-                        <div class="input-with-icon">
-                            <i class="fa-solid fa-user"></i>
-                            <input asp-for="FullName" placeholder="Votre nom..." />
+                <div class="card card-p mb-8">
+                    <h3 class="section-title mb-6" style="font-size:18px;">🔒 Sécurité</h3>
+                    <div class="form-grid">
+                        <div class="form-group-premium">
+                            <label asp-for="NewPassword" class="form-label-premium">Nouveau mot de passe</label>
+                            <div class="input-icon-wrap">
+                                <i class="fa-solid fa-lock"></i>
+                                <input asp-for="NewPassword" type="password" class="input-premium" placeholder="••••••••" />
+                            </div>
+                            <span asp-validation-for="NewPassword" class="text-danger"></span>
                         </div>
-                        <span asp-validation-for="FullName" class="error"></span>
-                    </div>
-
-                    <div class="field-group">
-                        <label asp-for="Email">Adresse email</label>
-                        <div class="input-with-icon">
-                            <i class="fa-solid fa-envelope"></i>
-                            <input asp-for="Email" placeholder="email@exemple.com" />
+                        <div class="form-group-premium">
+                            <label asp-for="ConfirmPassword" class="form-label-premium">Confirmer</label>
+                            <div class="input-icon-wrap">
+                                <i class="fa-solid fa-shield-halved"></i>
+                                <input asp-for="ConfirmPassword" type="password" class="input-premium" placeholder="••••••••" />
+                            </div>
+                            <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
                         </div>
-                        <span asp-validation-for="Email" class="error"></span>
                     </div>
+                    <p class="hint-text mt-4">Laissez vide si vous ne souhaitez pas modifier votre mot de passe.</p>
                 </div>
-            </div>
 
-            <div class="form-section-card mt-8">
-                <h3 class="section-title-sm mb-8">Sécurité & Mot de passe</h3>
-                
-                <div class="form-grid-2">
-                    <div class="field-group">
-                        <label asp-for="NewPassword">Nouveau mot de passe</label>
-                        <div class="input-with-icon">
-                            <i class="fa-solid fa-lock"></i>
-                            <input asp-for="NewPassword" type="password" placeholder="••••••••" />
-                        </div>
-                        <span asp-validation-for="NewPassword" class="error"></span>
-                    </div>
-
-                    <div class="field-group">
-                        <label asp-for="ConfirmPassword">Confirmer le mot de passe</label>
-                        <div class="input-with-icon">
-                            <i class="fa-solid fa-shield-halved"></i>
-                            <input asp-for="ConfirmPassword" type="password" placeholder="••••••••" />
-                        </div>
-                        <span asp-validation-for="ConfirmPassword" class="error"></span>
-                    </div>
+                <div style="display:flex; justify-content:flex-end;">
+                    <button type="submit" class="btn btn-coral py-4 px-10">
+                        <i class="fa-solid fa-save mr-2"></i> Enregistrer les modifications
+                    </button>
                 </div>
-                <p class="text-xs text-gray-400 mt-4 italic">Laissez vide si vous ne souhaitez pas modifier votre mot de passe.</p>
-            </div>
-
-            <div class="flex justify-end mt-10">
-                <button type="submit" class="btn-save-profile">
-                    Enregistrer les modifications <i class="fa-solid fa-paper-plane ml-2"></i>
-                </button>
             </div>
         </div>
     </form>
 </div>
 
 <style>
-    .profile-premium-container { max-width: 1100px; margin: 0 auto; }
-    .profile-layout { display: grid; grid-template-columns: 350px 1fr; gap: 40px; align-items: start; }
+.profile-grid { display: grid; grid-template-columns: 320px 1fr; gap: 32px; align-items: start; }
+@@media (max-width: 900px) { .profile-grid { grid-template-columns: 1fr; } }
 
-    /* Sidebar Card */
-    .profile-sidebar-card { background: white; border-radius: 40px; padding: 40px; border: 1px solid var(--color-border); text-align: center; }
-    .main-avatar-wrapper { position: relative; width: 160px; height: 160px; margin: 0 auto; }
-    .main-avatar-wrapper img { width: 100%; height: 100%; border-radius: 50px; object-fit: cover; border: 5px solid white; box-shadow: 0 15px 35px rgba(0,0,0,0.1); }
-    .edit-badge { position: absolute; bottom: -10px; right: -10px; width: 44px; height: 44px; background: var(--color-primary); color: white; border-radius: 16px; display: flex; align-items: center; justify-content: center; border: 4px solid white; box-shadow: 0 8px 15px rgba(255, 90, 95, 0.3); }
+.profile-avatar-main { position: relative; width: 140px; height: 140px; margin: 0 auto; }
+.profile-avatar-main img { width: 100%; height: 100%; border-radius: 40px; object-fit: cover; border: 4px solid white; box-shadow: var(--shadow-sm); }
+.avatar-edit-badge { position: absolute; bottom: -8px; right: -8px; width: 38px; height: 38px; background: var(--coral); color: white; border-radius: 12px; display: flex; align-items: center; justify-content: center; border: 3px solid white; font-size: 14px; box-shadow: var(--shadow-coral-sm); }
 
-    .user-display-name { font-size: 24px; font-weight: 850; color: var(--color-text-primary); letter-spacing: -0.5px; }
-    .user-display-email { font-size: 14px; color: var(--color-text-muted); font-weight: 500; }
+.profile-name-display { font-family: var(--font-display); font-size: 22px; font-weight: 900; color: var(--ink); }
+.profile-email-display { font-size: 14px; color: var(--ink-4); font-weight: 500; }
 
-    .avatars-flex { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; }
-    .avatar-option-premium { position: relative; cursor: pointer; transition: 0.3s; }
-    .avatar-option-premium img { width: 50px; height: 50px; border-radius: 15px; border: 2px solid transparent; transition: 0.3s; }
-    .avatar-option-premium:hover img { transform: translateY(-3px) scale(1.1); }
-    .avatar-option-premium.active img { border-color: var(--color-primary); transform: scale(1.1); }
-    
-    .mini-check { position: absolute; top: -5px; right: -5px; background: var(--color-primary); color: white; width: 18px; height: 18px; border-radius: 50%; font-size: 8px; display: none; align-items: center; justify-content: center; border: 2px solid white; }
-    .avatar-option-premium.active .mini-check { display: flex; }
+.avatar-picker-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.avatar-item { position: relative; cursor: pointer; transition: var(--t-fast); }
+.avatar-item img { width: 100%; border-radius: 12px; border: 2px solid transparent; transition: var(--t-fast); }
+.avatar-item:hover img { transform: translateY(-3px); border-color: var(--border-strong); }
+.avatar-item.is-active img { border-color: var(--coral); transform: scale(1.05); }
+.avatar-check { position: absolute; top: -5px; right: -5px; width: 18px; height: 18px; background: var(--coral); color: white; border-radius: 50%; display: none; align-items: center; justify-content: center; font-size: 8px; border: 2px solid white; }
+.avatar-item.is-active .avatar-check { display: flex; }
 
-    /* Main Fields */
-    .form-section-card { background: white; border-radius: 32px; padding: 32px; border: 1px solid var(--color-border); }
-    .section-title-sm { font-size: 18px; font-weight: 850; color: var(--color-text-primary); }
-    
-    .form-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
-    .field-group label { display: block; font-size: 12px; font-weight: 800; color: var(--color-text-muted); text-transform: uppercase; margin-bottom: 8px; margin-left: 4px; }
-    
-    .input-with-icon { position: relative; }
-    .input-with-icon i { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: #94A3B8; font-size: 14px; }
-    .input-with-icon input { width: 100%; padding: 14px 16px 14px 44px; border-radius: 16px; border: 1px solid #E2E8F0; background: #F8FAFC; font-weight: 700; color: var(--color-text-primary); transition: 0.3s; outline: none; }
-    .input-with-icon input:focus { border-color: var(--color-primary); background: white; box-shadow: 0 0 0 4px var(--color-primary-bg); }
+.form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; }
+.input-icon-wrap { position: relative; }
+.input-icon-wrap i { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: var(--ink-4); font-size: 14px; }
+.input-icon-wrap .input-premium { padding-left: 44px; }
 
-    .btn-save-profile { background: var(--color-primary); color: white; border: none; padding: 16px 32px; border-radius: 20px; font-weight: 850; font-size: 15px; cursor: pointer; transition: 0.3s; box-shadow: 0 10px 25px rgba(255, 90, 95, 0.25); }
-    .btn-save-profile:hover { transform: translateY(-4px) scale(1.02); box-shadow: 0 15px 35px rgba(255, 90, 95, 0.35); }
-
-    @@media (max-width: 900px) {
-        .profile-layout { grid-template-columns: 1fr; }
-        .form-grid-2 { grid-template-columns: 1fr; }
-    }
+.hint-text { font-size: 12px; font-style: italic; color: var(--ink-4); }
 </style>
 
 @section Scripts {
@@ -174,10 +143,8 @@
         function selectAvatar(resolvedUrl, el, rawUrl) {
             document.getElementById('avatar-input').value = rawUrl;
             document.getElementById('profile-preview').src = resolvedUrl;
-            document.querySelectorAll('.avatar-option-premium').forEach(opt => {
-                opt.classList.remove('active');
-            });
-            el.classList.add('active');
+            document.querySelectorAll('.avatar-item').forEach(opt => opt.classList.remove('is-active'));
+            el.classList.add('is-active');
         }
     </script>
 }

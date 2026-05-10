@@ -6,90 +6,159 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Connexion – Bayti</title>
-    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
     <link rel="stylesheet" href="~/css/variables.css" asp-append-version="true"/>
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-        body { min-height: 100vh; background: var(--bg); font-family: var(--font-body); display: grid; place-items: center; padding: 20px; }
+        body {
+            min-height: 100vh;
+            background: linear-gradient(145deg, #1A1D2E 0%, #252941 50%, #1E2340 100%);
+            font-family: var(--font-body);
+            display: grid; place-items: center; padding: 20px;
+            overflow: hidden; position: relative;
+        }
 
+        /* Floating bubbles */
+        .login-bubbles { position: fixed; inset: 0; pointer-events: none; z-index: 0; }
+        .lb {
+            position: absolute; border-radius: 50%;
+            animation: lbFloat linear infinite;
+        }
+        .lb:nth-child(1)  { width:70px;  height:70px;  left:8%;   bottom:-80px; animation-duration:20s; animation-delay:0s;   background: radial-gradient(circle at 30% 30%, rgba(255,107,107,0.35), rgba(255,107,107,0.05)); border:1px solid rgba(255,107,107,0.2); }
+        .lb:nth-child(2)  { width:110px; height:110px; left:18%;  bottom:-120px; animation-duration:25s; animation-delay:4s;  background: radial-gradient(circle at 30% 30%, rgba(0,201,167,0.30), rgba(0,201,167,0.04)); border:1px solid rgba(0,201,167,0.18); }
+        .lb:nth-child(3)  { width:50px;  height:50px;  left:30%;  bottom:-60px; animation-duration:18s; animation-delay:2s;   background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.20), rgba(255,255,255,0.03)); border:1px solid rgba(255,255,255,0.12); }
+        .lb:nth-child(4)  { width:80px;  height:80px;  left:48%;  bottom:-90px; animation-duration:22s; animation-delay:7s;   background: radial-gradient(circle at 30% 30%, rgba(167,139,250,0.30), rgba(167,139,250,0.04)); border:1px solid rgba(167,139,250,0.18); }
+        .lb:nth-child(5)  { width:40px;  height:40px;  left:62%;  bottom:-50px; animation-duration:16s; animation-delay:1s;   background: radial-gradient(circle at 30% 30%, rgba(255,107,107,0.25), rgba(255,107,107,0.04)); border:1px solid rgba(255,107,107,0.15); }
+        .lb:nth-child(6)  { width:95px;  height:95px;  left:74%;  bottom:-110px; animation-duration:28s; animation-delay:5s;  background: radial-gradient(circle at 30% 30%, rgba(0,201,167,0.28), rgba(0,201,167,0.04)); border:1px solid rgba(0,201,167,0.16); }
+        .lb:nth-child(7)  { width:60px;  height:60px;  left:86%;  bottom:-70px; animation-duration:19s; animation-delay:9s;   background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.18), rgba(255,255,255,0.02)); border:1px solid rgba(255,255,255,0.10); }
+        .lb:nth-child(8)  { width:35px;  height:35px;  left:93%;  bottom:-45px; animation-duration:14s; animation-delay:3s;   background: radial-gradient(circle at 30% 30%, rgba(245,166,35,0.30), rgba(245,166,35,0.04)); border:1px solid rgba(245,166,35,0.18); }
+        @@keyframes lbFloat {
+            0%   { transform: translateY(0) scale(0.9); opacity: 0; }
+            5%   { opacity: 1; }
+            95%  { opacity: 0.9; }
+            100% { transform: translateY(-105vh) scale(1.1); opacity: 0; }
+        }
+
+        /* Background glow orbs */
+        .glow-orb { position: fixed; border-radius: 50%; filter: blur(80px); pointer-events: none; z-index: 0; }
+        .glow-orb-1 { width: 500px; height: 500px; background: rgba(255,107,107,0.12); top: -150px; left: -100px; }
+        .glow-orb-2 { width: 400px; height: 400px; background: rgba(0,201,167,0.10); bottom: -100px; right: -80px; }
+        .glow-orb-3 { width: 300px; height: 300px; background: rgba(167,139,250,0.09); top: 50%; left: 50%; transform: translate(-50%,-50%); }
+
+        /* Auth shell */
         .auth-shell {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            width: 100%;
-            max-width: 900px;
-            border-radius: var(--r-xl);
-            overflow: hidden;
-            box-shadow: var(--shadow-lg);
+            display: grid; grid-template-columns: 1fr 1fr;
+            width: 100%; max-width: 920px;
+            border-radius: 32px; overflow: hidden;
+            box-shadow: 0 30px 80px rgba(0,0,0,0.5);
+            position: relative; z-index: 1;
         }
 
-        /* LEFT PANEL */
+        /* LEFT */
         .auth-left {
-            background: var(--grad-hero);
+            background: linear-gradient(145deg, #FF6B6B 0%, #FF8E8E 35%, #FF6B9D 65%, #C44FFF 100%);
             padding: 56px 48px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            position: relative;
-            overflow: hidden;
+            display: flex; flex-direction: column; justify-content: space-between;
+            position: relative; overflow: hidden;
         }
-        .auth-left::before { content:''; position:absolute; width:300px; height:300px; background:rgba(255,255,255,0.08); border-radius:50%; top:-100px; right:-100px; }
-        .auth-left::after  { content:''; position:absolute; width:220px; height:220px; background:rgba(255,255,255,0.06); border-radius:50%; bottom:-80px; left:-40px; }
+        .auth-left::before { content:''; position:absolute; width:320px; height:320px; background:rgba(255,255,255,0.09); border-radius:50%; top:-120px; right:-100px; }
+        .auth-left::after  { content:''; position:absolute; width:240px; height:240px; background:rgba(255,255,255,0.06); border-radius:50%; bottom:-80px; left:-50px; }
 
-        .al-logo { font-family: var(--font-display); font-size: 30px; font-weight: 900; color: white; letter-spacing: -1px; position:relative;z-index:1; }
-        .al-logo small { display:block; font-size:13px; font-weight:500; opacity:0.75; margin-top:2px; letter-spacing:0; }
+        .al-logo { position: relative; z-index: 1; }
+        .al-logo-icon { width: 56px; height: 56px; background: rgba(255,255,255,0.25); border-radius: 18px; display: flex; align-items: center; justify-content: center; font-size: 26px; margin-bottom: 14px; backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.3); }
+        .al-logo-name { font-family: 'Nunito', sans-serif; font-size: 34px; font-weight: 900; color: white; letter-spacing: -1px; line-height: 1; }
+        .al-logo-tag { font-size: 13px; color: rgba(255,255,255,0.7); font-weight: 500; margin-top: 4px; }
 
-        .al-features { display:flex; flex-direction:column; gap:20px; position:relative;z-index:1; }
-        .al-feat { display:flex; align-items:center; gap:14px; }
-        .al-feat-icon { width:42px; height:42px; background:rgba(255,255,255,0.2); border-radius:var(--r-sm); display:flex; align-items:center; justify-content:center; font-size:20px; flex-shrink:0; }
-        .al-feat-text strong { display:block; font-size:14px; font-weight:700; color:white; }
-        .al-feat-text span { font-size:12px; color:rgba(255,255,255,0.75); }
+        .al-features { display: flex; flex-direction: column; gap: 20px; position: relative; z-index: 1; }
+        .al-feat { display: flex; align-items: center; gap: 16px; }
+        .al-feat-icon { width: 46px; height: 46px; background: rgba(255,255,255,0.18); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.2); }
+        .al-feat-text strong { display: block; font-size: 14px; font-weight: 700; color: white; }
+        .al-feat-text span { font-size: 12px; color: rgba(255,255,255,0.70); }
 
-        /* RIGHT PANEL */
-        .auth-right { background: var(--surface); padding: 56px 52px; display:flex; flex-direction:column; justify-content:center; }
-        .auth-title { font-family:var(--font-display); font-size:26px; font-weight:900; color:var(--ink); letter-spacing:-0.5px; margin-bottom:6px; }
-        .auth-sub { font-size:14px; color:var(--ink-3); margin-bottom:32px; }
+        .al-footer { position: relative; z-index: 1; font-size: 12px; color: rgba(255,255,255,0.5); }
 
-        .form-group { margin-bottom:18px; }
-        .form-lbl { display:block; font-size:11px; font-weight:800; color:var(--ink-3); text-transform:uppercase; letter-spacing:0.8px; margin-bottom:8px; }
-        .form-inp { width:100%; padding:12px 16px; background:var(--bg-2); border:1.5px solid var(--border); border-radius:var(--r-sm); font-family:var(--font-body); font-size:14px; font-weight:500; color:var(--ink); transition:var(--t-fast); }
-        .form-inp:focus { outline:none; background:var(--surface); border-color:var(--coral); box-shadow:var(--coral-glow); }
-        .form-inp::placeholder { color:var(--ink-4); }
+        /* RIGHT */
+        .auth-right {
+            background: #13152B;
+            padding: 56px 52px;
+            display: flex; flex-direction: column; justify-content: center;
+        }
+        .auth-welcome { font-size: 13px; font-weight: 700; color: var(--coral); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 10px; }
+        .auth-title { font-family: 'Nunito', sans-serif; font-size: 28px; font-weight: 900; color: white; letter-spacing: -0.5px; margin-bottom: 6px; }
+        .auth-sub { font-size: 14px; color: rgba(255,255,255,0.45); margin-bottom: 36px; }
 
-        .auth-opts { display:flex; justify-content:space-between; align-items:center; margin-bottom:24px; font-size:13px; font-weight:600; }
-        .remember { display:flex; align-items:center; gap:8px; color:var(--ink-3); cursor:pointer; }
-        .remember input { width:16px; height:16px; accent-color:var(--coral); }
-        .forgot { color:var(--coral); text-decoration:none; }
-        .forgot:hover { text-decoration:underline; }
+        .form-group { margin-bottom: 20px; }
+        .form-lbl { display: block; font-size: 11px; font-weight: 800; color: rgba(255,255,255,0.45); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 8px; }
+        .form-inp {
+            width: 100%; padding: 14px 18px;
+            background: rgba(255,255,255,0.06);
+            border: 1.5px solid rgba(255,255,255,0.10);
+            border-radius: 12px;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 14px; font-weight: 500; color: white;
+            transition: all 0.2s;
+        }
+        .form-inp:focus { outline: none; background: rgba(255,255,255,0.09); border-color: rgba(255,107,107,0.6); box-shadow: 0 0 0 4px rgba(255,107,107,0.12); }
+        .form-inp::placeholder { color: rgba(255,255,255,0.25); }
 
-        .btn-submit { width:100%; padding:14px; background:var(--grad-coral); color:white; border:none; border-radius:var(--r-md); font-family:var(--font-display); font-size:16px; font-weight:800; cursor:pointer; transition:var(--t-spring); box-shadow:var(--shadow-coral-sm); }
-        .btn-submit:hover { transform:translateY(-2px); box-shadow:var(--shadow-coral); }
+        .auth-opts { display: flex; justify-content: space-between; align-items: center; margin-bottom: 26px; font-size: 13px; font-weight: 600; }
+        .remember { display: flex; align-items: center; gap: 8px; color: rgba(255,255,255,0.45); cursor: pointer; }
+        .remember input { width: 16px; height: 16px; accent-color: var(--coral); }
+        .forgot { color: var(--coral-light); text-decoration: none; }
+        .forgot:hover { text-decoration: underline; }
 
-        .auth-foot { margin-top:20px; text-align:center; font-size:14px; color:var(--ink-3); font-weight:600; }
-        .auth-foot a { color:var(--coral); font-weight:800; }
+        .btn-submit {
+            width: 100%; padding: 15px;
+            background: linear-gradient(135deg, #FF6B6B 0%, #FF9494 100%);
+            color: white; border: none; border-radius: 14px;
+            font-family: 'Nunito', sans-serif; font-size: 16px; font-weight: 800;
+            cursor: pointer; transition: all 0.35s cubic-bezier(0.34,1.56,0.64,1);
+            box-shadow: 0 6px 24px rgba(255,107,107,0.35);
+            letter-spacing: 0.3px;
+        }
+        .btn-submit:hover { transform: translateY(-3px) scale(1.01); box-shadow: 0 12px 36px rgba(255,107,107,0.45); }
+
+        .auth-foot { margin-top: 22px; text-align: center; font-size: 14px; color: rgba(255,255,255,0.40); font-weight: 600; }
+        .auth-foot a { color: var(--coral-light); font-weight: 800; }
+        .auth-foot a:hover { text-decoration: underline; }
+
+        .val-error { background: rgba(255,107,107,0.12); color: #FF9494; border: 1px solid rgba(255,107,107,0.25); border-radius: 10px; padding: 12px 16px; font-size: 13px; font-weight: 600; margin-bottom: 16px; }
     </style>
 </head>
 <body>
-    <div class="auth-shell">
+    <!-- Glow orbs -->
+    <div class="glow-orb glow-orb-1"></div>
+    <div class="glow-orb glow-orb-2"></div>
+    <div class="glow-orb glow-orb-3"></div>
 
+    <!-- Bubbles -->
+    <div class="login-bubbles" aria-hidden="true">
+        <div class="lb"></div><div class="lb"></div><div class="lb"></div>
+        <div class="lb"></div><div class="lb"></div><div class="lb"></div>
+        <div class="lb"></div><div class="lb"></div>
+    </div>
+
+    <div class="auth-shell">
         <div class="auth-left">
             <div class="al-logo">
-                🏠 Bayti
-                <small>Gestion de colocation</small>
+                <div class="al-logo-icon">🏠</div>
+                <div class="al-logo-name">Bayti</div>
+                <div class="al-logo-tag">Gestion de colocation zen</div>
             </div>
             <div class="al-features">
                 <div class="al-feat">
                     <div class="al-feat-icon">🧹</div>
                     <div class="al-feat-text">
                         <strong>Missions de ménage</strong>
-                        <span>Attribuez et suivez chaque tâche</span>
+                        <span>Attribuez et suivez chaque tâche facilement</span>
                     </div>
                 </div>
                 <div class="al-feat">
                     <div class="al-feat-icon">⭐</div>
                     <div class="al-feat-text">
                         <strong>Points & Récompenses</strong>
-                        <span>Motivez vos colocataires</span>
+                        <span>Motivez vos colocataires avec des cadeaux</span>
                     </div>
                 </div>
                 <div class="al-feat">
@@ -99,37 +168,45 @@
                         <span>Qui entretient le mieux la maison ?</span>
                     </div>
                 </div>
+                <div class="al-feat">
+                    <div class="al-feat-icon">📅</div>
+                    <div class="al-feat-text">
+                        <strong>Planning intelligent</strong>
+                        <span>Récurrence automatique des tâches</span>
+                    </div>
+                </div>
             </div>
+            <div class="al-footer">© 2025 Bayti · Coloc' Zen ✨</div>
         </div>
 
         <div class="auth-right">
-            <h1 class="auth-title">Bon retour ! 👋</h1>
-            <p class="auth-sub">Connectez-vous pour accéder à votre espace.</p>
+            <div class="auth-welcome">👋 Bon retour !</div>
+            <h1 class="auth-title">Connexion à Bayti</h1>
+            <p class="auth-sub">Accédez à votre espace de colocation.</p>
 
             <form asp-action="Login" method="post">
-                <div asp-validation-summary="ModelOnly" style="color:var(--red);font-size:13px;margin-bottom:14px;font-weight:600;"></div>
+                <div asp-validation-summary="ModelOnly" class="val-error"></div>
 
                 <div class="form-group">
-                    <label asp-for="Email" class="form-lbl">Email</label>
+                    <label asp-for="Email" class="form-lbl">📧 Adresse email</label>
                     <input asp-for="Email" class="form-inp" placeholder="nom@exemple.com" required />
                 </div>
                 <div class="form-group">
-                    <label asp-for="Password" class="form-lbl">Mot de passe</label>
+                    <label asp-for="Password" class="form-lbl">🔑 Mot de passe</label>
                     <input asp-for="Password" type="password" class="form-inp" placeholder="••••••••" required />
                 </div>
 
                 <div class="auth-opts">
                     <label class="remember">
-                        <input asp-for="RememberMe" type="checkbox" /> Se souvenir
+                        <input asp-for="RememberMe" type="checkbox" /> Se souvenir de moi
                     </label>
-                    <a href="#" class="forgot">Oublié ?</a>
+                    <a href="#" class="forgot">Mot de passe oublié ?</a>
                 </div>
 
                 <button type="submit" class="btn-submit">Se connecter →</button>
-                <div class="auth-foot">Pas de compte ? <a asp-action="Register">S'inscrire</a></div>
+                <div class="auth-foot">Pas encore de compte ? <a asp-action="Register">Créer un compte</a></div>
             </form>
         </div>
-
     </div>
 </body>
 </html>
