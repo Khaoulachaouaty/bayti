@@ -251,12 +251,36 @@
 .confirm-box { text-align: center; }
 </style>
 
+<!-- Toast Container -->
+<div id="toast-container"></div>
+
 <script>
 function copyInviteCode() {
     const code = document.getElementById('inviteCode').innerText;
     navigator.clipboard.writeText(code).then(() => {
-        alert("Code copié ! ✨");
+        showToast('Code copié ! ✨', 'Le code d\'accès a été copié dans le presse-papiers.', 'fa-solid fa-check');
     });
+}
+
+function showToast(title, message, iconClass) {
+    const container = document.getElementById('toast-container');
+    const toast = document.createElement('div');
+    toast.className = 'toast-card';
+    toast.innerHTML = `
+        <div class="toast-icon"><i class="${iconClass}"></i></div>
+        <div class="toast-content">
+            <div class="toast-title">${title}</div>
+            <div class="toast-msg">${message}</div>
+        </div>
+    `;
+    container.appendChild(toast);
+    
+    // Remove toast after animation (3s slideOut starts after 0s, but we can just let it finish or remove it)
+    setTimeout(() => {
+        if(container.contains(toast)) {
+            container.removeChild(toast);
+        }
+    }, 3500);
 }
 
 const colocationName = "@Model.Name";
