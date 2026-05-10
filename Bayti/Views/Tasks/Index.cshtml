@@ -17,7 +17,7 @@
                 <h1 class="page-title">🧹 Mes Tâches</h1>
                 <p class="page-subtitle">@DateTime.Now.ToString("dddd dd MMMM", new System.Globalization.CultureInfo("fr-FR"))</p>
             </div>
-            @if (User.FindFirst("IsAdmin")?.Value == "True")
+            @if (User.FindFirst("IsAdmin")?.Value == "True" && ViewBag.AssignmentMode == "Manuel")
             {
                 <a asp-action="Manage" class="btn btn-ghost">
                     <i class="fa-solid fa-crown"></i> Gérer toutes
@@ -81,6 +81,12 @@
                     <div class="tc-action">
                         @if (item.Status == "Completed") {
                             <div class="done-badge"><i class="fa-solid fa-circle-check"></i> Fait !</div>
+                        } else if (item.AssignedUserId == null) {
+                            <form asp-action="Claim" asp-route-id="@item.Id" method="post">
+                                <button type="submit" class="btn-claim" title="S'attribuer cette tâche">
+                                    <i class="fa-solid fa-hand-sparkles"></i> Choisir
+                                </button>
+                            </form>
                         } else {
                             <form asp-action="Complete" asp-route-id="@item.Id" method="post">
                                 <button type="submit" class="btn-complete">
@@ -137,5 +143,15 @@
     white-space: nowrap;
 }
 .btn-complete:hover { transform: scale(1.06); box-shadow: var(--shadow-mint); }
+
+.btn-claim {
+    background: var(--surface); color: var(--coral);
+    border: 2px solid var(--coral); padding: 8px 18px; border-radius: 12px;
+    font-weight: 800; font-size: 13px; cursor: pointer;
+    transition: var(--t-spring); display: flex; align-items: center; gap: 8px;
+    white-space: nowrap;
+}
+.btn-claim:hover { background: var(--coral); color: white; transform: scale(1.06); box-shadow: var(--shadow-coral-sm); }
+
 .done-badge { display: flex; align-items: center; gap: 6px; color: var(--green); font-weight: 800; font-size: 14px; white-space: nowrap; }
 </style>

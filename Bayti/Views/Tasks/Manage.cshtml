@@ -4,118 +4,107 @@
     var members = ViewBag.Members as IEnumerable<Bayti.Models.ApplicationUser>;
 }
 
-<div class="header-section mb-10">
-    <div class="flex justify-between items-center gap-6 flex-wrap">
+<div class="page-wrap">
+
+    <div class="page-header" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px;">
         <div>
-            <h1 class="page-title">Gérer les affectations</h1>
-            <p class="page-subtitle">Mode Manuel : Assignez les tâches du jour aux membres de la colocation.</p>
+            <h1 class="page-title">👑 Gérer les affectations</h1>
+            <p class="page-subtitle">Mode Manuel : Distribuez les tâches du jour aux membres de votre tribu.</p>
         </div>
-        <a asp-action="Index" class="btn-premium" style="background: var(--glass-bg); backdrop-filter: var(--glass-blur); color: var(--color-text-primary); border: var(--glass-border);">
-            <i class="fa-solid fa-arrow-left mr-2"></i>
-            Retour aux tâches
+        <a asp-action="Index" class="btn btn-ghost">
+            <i class="fa-solid fa-arrow-left"></i> Retour aux tâches
         </a>
     </div>
+
+    @if (!Model.Any())
+    {
+        <div class="empty-state">
+            <div class="empty-state-icon">✅</div>
+            <h3>Aucune tâche à assigner</h3>
+            <p>Toutes les tâches du jour ont déjà été terminées !</p>
+        </div>
+    }
+    else
+    {
+        <div class="tasks-grid">
+            @foreach (var task in Model)
+            {
+                <div class="task-card">
+                    <div class="tc-icon">
+                        @if (task.TaskTemplate.Category?.Icon?.StartsWith("fa-") == true) {
+                            <i class="fa-solid @task.TaskTemplate.Category.Icon"></i>
+                        } else {
+                            <span>@(task.TaskTemplate.Category?.Icon ?? "✨")</span>
+                        }
+                    </div>
+                    <div class="tc-body">
+                        <div class="tc-top">
+                            <h3 class="tc-title">@task.TaskTemplate.Title</h3>
+                            <div class="tc-pts">+@task.TaskTemplate.Points ⭐</div>
+                        </div>
+                        <div class="tc-meta">
+                            <span class="badge badge-mint">@task.TaskTemplate.Category?.Name</span>
+                            <span class="badge badge-blue"><i class="fa-solid fa-clock"></i> Avant 20h00</span>
+                        </div>
+                    </div>
+                    <div class="tc-action" style="min-width: 250px;">
+                        <form asp-action="AssignTask" method="post" style="display:flex; gap:8px; width:100%;">
+                            <input type="hidden" name="taskId" value="@task.Id" />
+                            <select name="assignedUserId" class="form-select flex-grow" style="background:var(--bg); border:1.5px solid var(--border); border-radius:12px; padding:10px 14px; font-family:var(--font-body); font-weight:700; color:var(--ink); flex:1;">
+                                <option value="">-- Non assigné --</option>
+                                @foreach (var member in members)
+                                {
+                                    <option value="@member.Id" selected="@(task.AssignedUserId == member.Id)">
+                                        @member.FullName
+                                    </option>
+                                }
+                            </select>
+                            <button type="submit" class="btn-assign" title="Valider l'assignation">
+                                <i class="fa-solid fa-check"></i>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            }
+        </div>
+    }
 </div>
 
-@if (!Model.Any())
-{
-    <div class="empty-state-fine">
-        <div class="empty-illustration">
-            <i class="fa-solid fa-clipboard-check"></i>
-        </div>
-        <p>Toutes les tâches sont terminées pour aujourd'hui !</p>
-    </div>
-}
-else
-{
-    <div class="responsive-grid">
-        @foreach (var task in Model)
-        {
-            <div class="fine-card">
-                <div class="card-top">
-                    <div class="category-indicator">
-                        <span class="dot" style="background: var(--color-primary)"></span>
-                        @task.TaskTemplate.Category?.Name
-                    </div>
-                    <div class="points-badge">
-                        <i class="fa-solid fa-bolt-lightning"></i> @task.TaskTemplate.Points
-                    </div>
-                </div>
-
-                <h3 class="fine-card-title">@task.TaskTemplate.Title</h3>
-                <p class="fine-card-desc" style="flex-grow: 0; margin-bottom: 20px;">
-                    À faire avant 20h00 aujourd'hui.
-                </p>
-
-                <div class="card-details mt-auto">
-                    <form asp-action="AssignTask" method="post" class="flex gap-2">
-                        <input type="hidden" name="taskId" value="@task.Id" />
-                        <select name="assignedUserId" class="form-select flex-grow" style="background: var(--glass-bg); border: var(--glass-border); border-radius: 12px; padding: 10px; font-weight: 700; color: var(--color-text-primary); outline: none;">
-                            <option value="">-- Non assigné --</option>
-                            @foreach (var member in members)
-                            {
-                                <option value="@member.Id" selected="@(task.AssignedUserId == member.Id)">
-                                    @member.FullName
-                                </option>
-                            }
-                        </select>
-                        <button type="submit" class="btn" style="background: var(--gradient-primary); color: white; border-radius: 12px; padding: 10px 16px; border: none; box-shadow: var(--shadow-sm);">
-                            <i class="fa-solid fa-check"></i>
-                        </button>
-                    </form>
-                </div>
-            </div>
-        }
-    </div>
-}
-
 <style>
-    .page-title { font-size: 32px; font-weight: 700; color: var(--color-text-primary); letter-spacing: -0.5px; }
-    .page-subtitle { color: var(--color-text-secondary); font-size: 15px; margin-top: 4px; }
+.page-subtitle { font-size: 14px; color: var(--ink-3); margin-top: 4px; }
 
-    .btn-premium {
-        padding: 12px 28px;
-        border-radius: 18px;
-        background: var(--color-primary);
-        color: white;
-        font-size: 14px;
-        font-weight: 700;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        border: none;
-        display: inline-flex;
-        align-items: center;
-        box-shadow: 0 8px 20px rgba(255, 90, 95, 0.25);
-        text-decoration: none;
-    }
-    .btn-premium:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 12px 30px rgba(255, 90, 95, 0.35);
-        color: white;
-    }
+.tasks-grid { display: flex; flex-direction: column; gap: 12px; }
+.task-card {
+    display: flex; align-items: center; gap: 18px;
+    padding: 18px 22px;
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: 18px;
+    transition: var(--t-spring);
+    box-shadow: var(--shadow-xs);
+    flex-wrap: wrap;
+}
+.task-card:hover { transform: translateX(6px); border-color: var(--coral); box-shadow: var(--shadow-sm); }
 
-    /* Fine Cards Compact (reused) */
-    .fine-card {
-        background: var(--glass-bg);
-        backdrop-filter: var(--glass-blur);
-        border: var(--glass-border);
-        border-radius: 28px;
-        padding: 24px 28px;
-        transition: var(--transition-base);
-        display: flex;
-        flex-direction: column;
-        height: 100%;
-        position: relative;
-    }
-    .fine-card:hover { transform: translateY(-6px); border-color: rgba(255, 90, 95, 0.4); box-shadow: var(--shadow-premium); }
+.tc-icon {
+    width: 54px; height: 54px; border-radius: 16px;
+    background: var(--coral-bg); color: var(--coral);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px; flex-shrink: 0;
+    border: 1.5px solid rgba(255,107,107,0.15);
+}
+.tc-body { flex: 1; min-width: 200px; }
+.tc-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; }
+.tc-title { font-size: 16px; font-weight: 800; color: var(--ink); }
+.tc-pts { font-family: var(--font-display); font-size: 15px; font-weight: 800; color: var(--coral); white-space: nowrap; }
+.tc-meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 
-    .card-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-    .category-indicator { display: flex; align-items: center; gap: 6px; font-size: 10px; font-weight: 800; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
-    .category-indicator .dot { width: 6px; height: 6px; border-radius: 50%; }
-    .points-badge { background: var(--color-accent-bg); color: var(--color-accent); padding: 4px 10px; border-radius: 10px; font-size: 11px; font-weight: 800; display: flex; align-items: center; gap: 4px; }
-
-    .fine-card-title { font-size: 18px; font-weight: 800; color: var(--color-text-primary); margin-bottom: 6px; letter-spacing: -0.3px; }
-    .fine-card-desc { font-size: 13px; color: var(--color-text-secondary); line-height: 1.5; }
-
-    .empty-state-fine { text-align: center; padding: 100px 0; color: var(--color-text-secondary); }
-    .empty-illustration { font-size: 48px; margin-bottom: 20px; opacity: 0.2; }
+.btn-assign {
+    background: var(--grad-coral); color: white;
+    border: none; border-radius: 12px; width: 44px; height: 44px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; cursor: pointer; transition: var(--t-spring);
+    box-shadow: var(--shadow-coral-sm); flex-shrink: 0;
+}
+.btn-assign:hover { transform: scale(1.1); box-shadow: var(--shadow-coral); }
 </style>
