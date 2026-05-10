@@ -33,11 +33,11 @@ namespace Bayti.Models
         public DateTime? ReadAt { get; set; }
 
         [MaxLength(300)]
-        public string ActionUrl { get; set; }
+        public string ActionUrl { get; set; } = "/";
 
         public int? RelatedEntityId { get; set; }
 
         [MaxLength(50)]
-        public string RelatedEntityType { get; set; }
+        public string RelatedEntityType { get; set; } = "General";
     }
 }

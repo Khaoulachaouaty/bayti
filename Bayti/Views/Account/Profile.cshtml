@@ -52,12 +52,11 @@
                         <div class="avatar-picker-grid">
                             @{
                                 var avatars = new List<string> { 
-                                    "/images/avatars/avatar1.png", "/images/avatars/avatar2.png", "/images/avatars/avatar3.png", 
-                                    "/images/avatars/avatar4.png", "/images/avatars/avatar5.png",
-                                    "https://api.dicebear.com/7.x/avataaars/png?seed=Felix",
-                                    "https://api.dicebear.com/7.x/avataaars/png?seed=Aneka",
-                                    "https://api.dicebear.com/7.x/avataaars/png?seed=Milo",
-                                    "https://api.dicebear.com/7.x/avataaars/png?seed=Zoe"
+                                    "/images/avatars/avatar1.png", 
+                                    "/images/avatars/avatar2.png", 
+                                    "/images/avatars/avatar3.png", 
+                                    "/images/avatars/avatar4.png", 
+                                    "/images/avatars/avatar5.png"
                                 };
                             }
                             @foreach (var url in avatars) {
@@ -162,7 +161,7 @@
 .badge-points { background: var(--amber-bg); color: var(--amber); border: 1px solid rgba(245,166,35,0.2); }
 
 /* Avatar Picker */
-.avatar-picker-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.avatar-picker-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; justify-content: center; }
 .avatar-item { position: relative; cursor: pointer; transition: var(--t-fast); border-radius: 16px; background: var(--bg); padding: 4px; border: 2px solid transparent; }
 .avatar-item img { width: 100%; border-radius: 12px; transition: var(--t-fast); }
 .avatar-item:hover { border-color: var(--border-strong); transform: translateY(-3px); }

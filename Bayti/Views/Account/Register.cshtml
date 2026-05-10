@@ -13,90 +13,169 @@
         *, *::before, *::after { box-sizing: border-box; margin:0; padding:0; }
         body {
             min-height: 100vh;
-            background: linear-gradient(135deg, #F8FAFC 0%, #E2E8F0 100%);
+            background: linear-gradient(135deg, #FFF5F5 0%, #F8FAFC 50%, #F0F4FF 100%);
             font-family: var(--font-body);
-            display: grid; place-items: center; padding: 32px 20px;
-            overflow: hidden; position: relative;
+            display: flex; align-items: center; justify-content: center;
+            padding: 24px 20px;
+            overflow-x: hidden; position: relative;
         }
-        
+
         /* Floating bubbles */
         .login-bubbles { position: fixed; inset: 0; pointer-events: none; z-index: 0; }
         .lb {
             position: absolute; border-radius: 50%;
             background: radial-gradient(circle at 25% 25%, rgba(255,255,255,0.4) 1%, rgba(255,255,255,0.02) 30%, transparent 60%);
-            box-shadow: 
-                inset 0 0 6px rgba(255, 255, 255, 0.2),
-                inset 4px 0 10px rgba(255, 107, 107, 0.1),
-                inset -4px 0 10px rgba(78, 205, 196, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow:
+                inset 0 0 6px rgba(255,255,255,0.2),
+                inset 4px 0 10px rgba(255,107,107,0.1),
+                inset -4px 0 10px rgba(78,205,196,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
             animation: lbFloat linear infinite, wobbleBubble 6s ease-in-out infinite alternate;
             backdrop-filter: blur(1px);
         }
         @@keyframes wobbleBubble {
-            0% { border-radius: 50% 50% 50% 50%; }
-            50% { border-radius: 48% 52% 51% 49%; }
+            0%   { border-radius: 50% 50% 50% 50%; }
+            50%  { border-radius: 48% 52% 51% 49%; }
             100% { border-radius: 52% 48% 49% 51%; }
         }
-        .lb:nth-child(1)  { width:70px;  height:70px;  left:8%;   bottom:-80px; animation-duration:20s, 6s; animation-delay:0s, 0s;   }
-        .lb:nth-child(2)  { width:110px; height:110px; left:18%;  bottom:-120px; animation-duration:25s, 5s; animation-delay:4s, 1s;  }
-        .lb:nth-child(3)  { width:50px;  height:50px;  left:30%;  bottom:-60px; animation-duration:18s, 7s; animation-delay:2s, 2s;   }
-        .lb:nth-child(4)  { width:80px;  height:80px;  left:48%;  bottom:-90px; animation-duration:22s, 6.5s; animation-delay:7s, 0s; }
-        .lb:nth-child(5)  { width:40px;  height:40px;  left:62%;  bottom:-50px; animation-duration:16s, 5.5s; animation-delay:1s, 1.5s; }
-        .lb:nth-child(6)  { width:95px;  height:95px;  left:74%;  bottom:-110px; animation-duration:28s, 6s; animation-delay:5s, 2s;  }
-        .lb:nth-child(7)  { width:60px;  height:60px;  left:86%;  bottom:-70px; animation-duration:19s, 6.2s; animation-delay:9s, 0.5s; }
-        .lb:nth-child(8)  { width:35px;  height:35px;  left:93%;  bottom:-45px; animation-duration:14s, 5s; animation-delay:3s, 1s;   }
+        .lb:nth-child(1) { width:70px;  height:70px;  left:8%;  bottom:-80px;  animation-duration:20s,6s;   animation-delay:0s,0s;   }
+        .lb:nth-child(2) { width:110px; height:110px; left:18%; bottom:-120px; animation-duration:25s,5s;   animation-delay:4s,1s;   }
+        .lb:nth-child(3) { width:50px;  height:50px;  left:30%; bottom:-60px;  animation-duration:18s,7s;   animation-delay:2s,2s;   }
+        .lb:nth-child(4) { width:80px;  height:80px;  left:48%; bottom:-90px;  animation-duration:22s,6.5s; animation-delay:7s,0s;   }
+        .lb:nth-child(5) { width:40px;  height:40px;  left:62%; bottom:-50px;  animation-duration:16s,5.5s; animation-delay:1s,1.5s; }
+        .lb:nth-child(6) { width:95px;  height:95px;  left:74%; bottom:-110px; animation-duration:28s,6s;   animation-delay:5s,2s;   }
+        .lb:nth-child(7) { width:60px;  height:60px;  left:86%; bottom:-70px;  animation-duration:19s,6.2s; animation-delay:9s,0.5s; }
+        .lb:nth-child(8) { width:35px;  height:35px;  left:93%; bottom:-45px;  animation-duration:14s,5s;   animation-delay:3s,1s;   }
         @@keyframes lbFloat {
             0%   { transform: translateY(0) scale(0.9) rotate(0deg); opacity: 0; }
             5%   { opacity: 1; }
             95%  { opacity: 0.9; }
             100% { transform: translateY(-105vh) scale(1.1) rotate(180deg); opacity: 0; }
         }
-        
-        /* Background glow orbs */
+
+        /* Glow orbs */
         .glow-orb { position: fixed; border-radius: 50%; filter: blur(80px); pointer-events: none; z-index: 0; }
-        .glow-orb-1 { width: 500px; height: 500px; background: rgba(255,107,107,0.15); top: -150px; left: -100px; }
-        .glow-orb-2 { width: 400px; height: 400px; background: rgba(0,201,167,0.12); bottom: -100px; right: -80px; }
-        
+        .glow-orb-1 { width: 500px; height: 500px; background: rgba(255,107,107,0.12); top: -150px; left: -100px; }
+        .glow-orb-2 { width: 400px; height: 400px; background: rgba(0,201,167,0.10); bottom: -100px; right: -80px; }
+
+        /* Card */
         .register-card {
             background: #FFFFFF;
-            width: 100%; max-width: 560px;
-            padding: 52px 48px;
-            border-radius: 28px;
-            box-shadow: 0 20px 60px rgba(15,23,42,0.08);
-            border: 1px solid #E2E8F0;
+            width: 100%; max-width: 580px;
+            border-radius: 32px;
+            box-shadow: 0 24px 80px rgba(15,23,42,0.10), 0 4px 16px rgba(255,107,107,0.08);
+            border: 1px solid rgba(255,255,255,0.9);
+            position: relative; z-index: 1;
+            overflow: hidden;
+        }
+
+        /* Card header */
+        .reg-banner {
+            height: 110px;
+            background: linear-gradient(135deg, #FF6B6B 0%, #FF8E8E 50%, #FFB3B3 100%);
+            position: relative; overflow: hidden;
+            display: flex; align-items: center; justify-content: center; gap: 14px;
+        }
+        .reg-banner-bubble { position: absolute; background: rgba(255,255,255,0.15); border-radius: 50%; }
+        .reg-banner-bubble.bb1 { width: 120px; height: 120px; top: -40px; right: -20px; }
+        .reg-banner-bubble.bb2 { width: 70px; height: 70px; bottom: -30px; left: 40px; }
+        .reg-banner-bubble.bb3 { width: 40px; height: 40px; top: 10px; left: 55%; }
+
+        /* Brand inside banner */
+        .reg-brand {
+            display: flex; align-items: center; gap: 14px;
             position: relative; z-index: 1;
         }
-        .reg-header { text-align:center; margin-bottom:32px; }
-        .reg-logo-box { width: 64px; height: 64px; background: var(--grad-coral); border-radius: 18px; display: flex; align-items: center; justify-content: center; font-size: 28px; color: white; margin: 0 auto 16px; box-shadow: 0 6px 20px rgba(255,107,107,0.4); }
-        .reg-title { font-family:var(--font-display); font-size:24px; font-weight:900; color:#0F172A; letter-spacing:-0.5px; margin-bottom:6px; }
-        .reg-sub { font-size:14px; color:#64748B; }
-        .form-group { margin-bottom:16px; }
-        .form-lbl { display:block; font-size:11px; font-weight:800; color:#475569; text-transform:uppercase; letter-spacing:0.8px; margin-bottom:8px; }
-        .form-inp { width:100%; padding:13px 16px; background:#F8FAFC; border:1.5px solid #E2E8F0; border-radius:12px; font-family:var(--font-body); font-size:14px; font-weight:500; color:#0F172A; transition:var(--t-fast); }
-        .form-inp:focus { outline:none; background:#FFFFFF; border-color:#FF6B6B; box-shadow:0 0 0 4px rgba(255,107,107,0.15); }
-        .form-inp::placeholder { color:#94A3B8; }
-        .form-row { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
-        .av-section { margin-bottom:24px; }
-        .av-label { display:block; font-size:11px; font-weight:800; color:#475569; text-transform:uppercase; letter-spacing:0.8px; margin-bottom:10px; }
-        .av-grid { display:flex; flex-wrap:wrap; gap:10px; }
-        .av-opt { cursor:pointer; border-radius:12px; border:2.5px solid #E2E8F0; padding:3px; transition:var(--t-spring); position:relative; }
-        .av-opt img { width:48px; height:48px; border-radius:10px; display:block; }
-        .av-opt:hover { transform:scale(1.06); border-color:#CBD5E1; }
-        .av-opt.active { border-color:#FF6B6B; box-shadow:0 0 0 4px rgba(255,107,107,0.15); transform:scale(1.1); }
-        .av-opt.active::after { content:'✓'; position:absolute; top:-6px; right:-6px; width:18px; height:18px; background:var(--coral); color:white; border-radius:50%; font-size:10px; font-weight:900; display:flex; align-items:center; justify-content:center; border:2px solid #FFFFFF; }
-        .btn-submit { width:100%; padding:15px; background:var(--grad-coral); color:white; border:none; border-radius:14px; font-family:var(--font-display); font-size:16px; font-weight:800; cursor:pointer; transition:var(--t-spring); box-shadow:var(--shadow-coral-sm); margin-bottom:16px; }
-        .btn-submit:hover { transform:translateY(-3px); box-shadow:var(--shadow-coral); }
-        .auth-foot { text-align:center; font-size:14px; color:#64748B; font-weight:600; }
-        .auth-foot a { color:var(--coral); font-weight:800; }
-        .val-error { background:rgba(255,107,107,0.1); color:#E11D48; border:1px solid rgba(255,107,107,0.2); border-radius:10px; padding:12px 16px; font-size:13px; font-weight:600; margin-bottom:16px; }
+        .reg-brand-icon {
+            width: 56px; height: 56px;
+            background: rgba(255,255,255,0.25);
+            border-radius: 18px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 26px; color: white;
+            border: 2px solid rgba(255,255,255,0.4);
+            backdrop-filter: blur(6px);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+        }
+        .reg-brand-text { color: white; }
+        .reg-brand-name { font-family: var(--font-display); font-size: 26px; font-weight: 900; line-height: 1; letter-spacing: -0.5px; text-shadow: 0 2px 8px rgba(0,0,0,0.15); }
+        .reg-brand-tag  { font-size: 12px; font-weight: 600; opacity: 0.85; margin-top: 3px; }
+
+        .reg-body { padding: 28px 40px 40px; }
+
+        .reg-header { text-align: center; margin-bottom: 28px; }
+        .reg-title { font-family: var(--font-display); font-size: 26px; font-weight: 900; color: #0F172A; letter-spacing: -0.5px; margin-bottom: 6px; }
+        .reg-sub { font-size: 14px; color: #64748B; font-weight: 500; line-height: 1.5; }
+
+        /* Form */
+        .form-group { margin-bottom: 16px; }
+        .form-lbl { display: block; font-size: 11px; font-weight: 800; color: #475569; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 7px; }
+        .form-inp-wrap { position: relative; }
+        .form-inp-wrap i { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: #94A3B8; font-size: 14px; }
+        .form-inp {
+            width: 100%; padding: 13px 16px 13px 40px;
+            background: #F8FAFC; border: 1.5px solid #E2E8F0; border-radius: 13px;
+            font-family: var(--font-body); font-size: 14px; font-weight: 500; color: #0F172A;
+            transition: all 0.2s ease;
+        }
+        .form-inp:focus { outline: none; background: #FFFFFF; border-color: #FF6B6B; box-shadow: 0 0 0 4px rgba(255,107,107,0.12); }
+        .form-inp::placeholder { color: #94A3B8; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+
+        /* Avatar section */
+        .av-section { margin: 20px 0 24px; }
+        .av-label { display: block; font-size: 11px; font-weight: 800; color: #475569; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 12px; }
+        .av-grid { display: flex; gap: 12px; justify-content: center; }
+        .av-opt {
+            cursor: pointer; border-radius: 16px; border: 2.5px solid #E2E8F0;
+            padding: 4px; transition: all 0.2s cubic-bezier(0.34,1.56,0.64,1);
+            position: relative; background: #F8FAFC;
+        }
+        .av-opt img { width: 68px; height: 68px; border-radius: 12px; display: block; object-fit: cover; }
+        .av-opt:hover { transform: translateY(-4px) scale(1.05); border-color: #CBD5E1; box-shadow: 0 8px 20px rgba(15,23,42,0.1); }
+        .av-opt.active {
+            border-color: #FF6B6B;
+            box-shadow: 0 0 0 4px rgba(255,107,107,0.15), 0 8px 20px rgba(255,107,107,0.2);
+            transform: translateY(-4px) scale(1.08);
+            background: #FFF5F5;
+        }
+        .av-check {
+            position: absolute; top: -7px; right: -7px;
+            width: 22px; height: 22px;
+            background: #FF6B6B; color: white; border-radius: 50%;
+            font-size: 10px; font-weight: 900;
+            display: none; align-items: center; justify-content: center;
+            border: 2.5px solid white; box-shadow: 0 2px 8px rgba(255,107,107,0.4);
+        }
+        .av-opt.active .av-check { display: flex; }
+
+        /* Submit */
+        .btn-submit {
+            width: 100%; padding: 16px;
+            background: linear-gradient(135deg, #FF6B6B, #FF4757);
+            color: white; border: none; border-radius: 14px;
+            font-family: var(--font-display); font-size: 16px; font-weight: 800;
+            cursor: pointer; transition: all 0.3s cubic-bezier(0.34,1.56,0.64,1);
+            box-shadow: 0 8px 24px rgba(255,107,107,0.35);
+            margin-bottom: 16px; letter-spacing: 0.3px;
+        }
+        .btn-submit:hover { transform: translateY(-3px); box-shadow: 0 12px 32px rgba(255,107,107,0.45); }
+        .btn-submit:active { transform: translateY(0); }
+
+        .auth-foot { text-align: center; font-size: 14px; color: #64748B; font-weight: 600; }
+        .auth-foot a { color: #FF6B6B; font-weight: 800; text-decoration: none; }
+        .auth-foot a:hover { text-decoration: underline; }
+
+        .val-error {
+            background: rgba(255,107,107,0.08); color: #E11D48;
+            border: 1px solid rgba(255,107,107,0.2); border-radius: 12px;
+            padding: 12px 16px; font-size: 13px; font-weight: 600; margin-bottom: 16px;
+        }
+        .val-error ul { padding-left: 16px; }
     </style>
 </head>
 <body>
-    <!-- Glow orbs -->
     <div class="glow-orb glow-orb-1"></div>
     <div class="glow-orb glow-orb-2"></div>
-
-    <!-- Bubbles -->
     <div class="login-bubbles" aria-hidden="true">
         <div class="lb"></div><div class="lb"></div><div class="lb"></div>
         <div class="lb"></div><div class="lb"></div><div class="lb"></div>
@@ -104,61 +183,91 @@
     </div>
 
     <div class="register-card">
-        <div class="reg-header">
-            <div class="reg-logo-box"><i class="fa-solid fa-house-chimney"></i></div>
-            <h1 class="reg-title">Créer un compte</h1>
-            <p class="reg-sub">Rejoignez votre colocation et gérez le ménage ensemble.</p>
+        <div class="reg-banner">
+            <div class="reg-banner-bubble bb1"></div>
+            <div class="reg-banner-bubble bb2"></div>
+            <div class="reg-banner-bubble bb3"></div>
+            <div class="reg-brand">
+                <div class="reg-brand-icon">
+                    <i class="fa-solid fa-house-chimney"></i>
+                </div>
+                <div class="reg-brand-text">
+                    <div class="reg-brand-name">Bayti</div>
+                    <div class="reg-brand-tag">Coloc' Zen ✨</div>
+                </div>
+            </div>
         </div>
 
-        <form asp-action="Register" method="post">
-            <div asp-validation-summary="All" class="val-error"></div>
-
-            <div class="form-group">
-                <label asp-for="FullName" class="form-lbl">Nom complet</label>
-                <input asp-for="FullName" class="form-inp" placeholder="Jean Dupont" required />
-            </div>
-            <div class="form-group">
-                <label asp-for="Email" class="form-lbl">Adresse Email</label>
-                <input asp-for="Email" class="form-inp" placeholder="jean@exemple.com" required />
-            </div>
-            <div class="form-row">
-                <div class="form-group">
-                    <label asp-for="Password" class="form-lbl">Mot de passe</label>
-                    <input asp-for="Password" type="password" class="form-inp" placeholder="••••••••" required />
-                </div>
-                <div class="form-group">
-                    <label asp-for="ConfirmPassword" class="form-lbl">Confirmation</label>
-                    <input asp-for="ConfirmPassword" type="password" class="form-inp" placeholder="••••••••" required />
-                </div>
+        <div class="reg-body">
+            <div class="reg-header">
+                <h1 class="reg-title">Créer un compte</h1>
+                <p class="reg-sub">Rejoignez votre colocation et gérez<br>le ménage ensemble.</p>
             </div>
 
-            <div class="av-section">
-                <span class="av-label">Votre avatar</span>
-                <input type="hidden" asp-for="AvatarUrl" id="av-input" value="/images/avatars/avatar1.png" />
-                <div class="av-grid">
-                    @{
-                        var avs = new[]{
-                            "/images/avatars/avatar1.png","/images/avatars/avatar2.png",
-                            "/images/avatars/avatar3.png","/images/avatars/avatar4.png",
-                            "/images/avatars/avatar5.png",
-                            "https://api.dicebear.com/7.x/avataaars/png?seed=Felix",
-                            "https://api.dicebear.com/7.x/avataaars/png?seed=Aneka",
-                            "https://api.dicebear.com/7.x/avataaars/png?seed=Milo"
-                        };
-                    }
-                    @foreach (var url in avs)
-                    {
-                        var src = url.StartsWith("http") ? url : Url.Content(url);
-                        <div class="av-opt @(url=="/images/avatars/avatar1.png"?"active":"")" onclick="pickAv('@url',this)">
-                            <img src="@src" />
+            <form asp-action="Register" method="post">
+                <div asp-validation-summary="All" class="val-error"></div>
+
+                <div class="form-group">
+                    <label asp-for="FullName" class="form-lbl">Nom complet</label>
+                    <div class="form-inp-wrap">
+                        <i class="fa-solid fa-user"></i>
+                        <input asp-for="FullName" class="form-inp" placeholder="Jean Dupont" required />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Email" class="form-lbl">Adresse Email</label>
+                    <div class="form-inp-wrap">
+                        <i class="fa-solid fa-envelope"></i>
+                        <input asp-for="Email" class="form-inp" placeholder="jean@exemple.com" required />
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label asp-for="Password" class="form-lbl">Mot de passe</label>
+                        <div class="form-inp-wrap">
+                            <i class="fa-solid fa-lock"></i>
+                            <input asp-for="Password" type="password" class="form-inp" placeholder="••••••••" required />
                         </div>
-                    }
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="ConfirmPassword" class="form-lbl">Confirmation</label>
+                        <div class="form-inp-wrap">
+                            <i class="fa-solid fa-shield-halved"></i>
+                            <input asp-for="ConfirmPassword" type="password" class="form-inp" placeholder="••••••••" required />
+                        </div>
+                    </div>
                 </div>
-            </div>
 
-            <button type="submit" class="btn-submit">Créer mon compte →</button>
-            <div class="auth-foot">Déjà inscrit ? <a asp-action="Login">Se connecter</a></div>
-        </form>
+                <div class="av-section">
+                    <span class="av-label"><i class="fa-solid fa-face-smile" style="color:#FF6B6B; margin-right:6px;"></i>Choisissez votre avatar</span>
+                    <input type="hidden" asp-for="AvatarUrl" id="av-input" value="/images/avatars/avatar1.png" />
+                    <div class="av-grid">
+                        @{
+                            var avs = new[]{
+                                "/images/avatars/avatar1.png",
+                                "/images/avatars/avatar2.png",
+                                "/images/avatars/avatar3.png",
+                                "/images/avatars/avatar4.png",
+                                "/images/avatars/avatar5.png"
+                            };
+                        }
+                        @foreach (var url in avs)
+                        {
+                            var src = Url.Content(url);
+                            <div class="av-opt @(url=="/images/avatars/avatar1.png" ? "active" : "")" onclick="pickAv('@url', this)">
+                                <img src="@src" alt="Avatar" />
+                                <div class="av-check"><i class="fa-solid fa-check"></i></div>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-submit">
+                    <i class="fa-solid fa-rocket" style="margin-right:8px;"></i>Créer mon compte
+                </button>
+                <div class="auth-foot">Déjà inscrit ? <a asp-action="Login">Se connecter</a></div>
+            </form>
+        </div>
     </div>
 
     <script>

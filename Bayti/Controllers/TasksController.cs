@@ -31,23 +31,35 @@ namespace Bayti.Controllers
 
             // Fetch tasks for today
             var today = DateTime.Today;
-            var tasksQuery = _context.TaskInstances
-                .Include(i => i.TaskTemplate)
-                    .ThenInclude(t => t.Category)
-                .Where(i => i.TaskTemplate.ColocationId == colocationId && 
-                           i.Status != "Completed" && 
-                           i.DueDate.Date <= today);
+
+            IQueryable<TaskInstance> tasksQuery;
 
             if (mode == "Participatif")
             {
-                tasksQuery = tasksQuery.Where(i => i.AssignedUserId == userId || i.AssignedUserId == null);
+                // Show ALL tasks for the colocation for TODAY only
+                tasksQuery = _context.TaskInstances
+                    .Include(i => i.TaskTemplate)
+                        .ThenInclude(t => t.Category)
+                    .Include(i => i.AssignedUser)
+                    .Where(i => i.TaskTemplate.ColocationId == colocationId
+                             && i.Status != "Completed"
+                             && i.DueDate.Date == today);
             }
             else
             {
-                tasksQuery = tasksQuery.Where(i => i.AssignedUserId == userId);
+                // Auto or Manuel: show only tasks assigned to the current user for TODAY
+                tasksQuery = _context.TaskInstances
+                    .Include(i => i.TaskTemplate)
+                        .ThenInclude(t => t.Category)
+                    .Where(i => i.TaskTemplate.ColocationId == colocationId
+                             && i.Status != "Completed"
+                             && i.DueDate.Date == today
+                             && i.AssignedUserId == userId);
             }
 
             var tasks = await tasksQuery.OrderBy(i => i.DueDate).ToListAsync();
+
+            ViewBag.CurrentUserId = userId;
 
             return View(tasks);
         }
@@ -226,7 +238,7 @@ namespace Bayti.Controllers
                 .Include(i => i.TaskTemplate)
                     .ThenInclude(t => t.Category)
                 .Include(i => i.AssignedUser)
-                .Where(i => i.TaskTemplate.ColocationId == colocationId && i.Status != "Completed" && i.DueDate.Date <= DateTime.Today)
+                .Where(i => i.TaskTemplate.ColocationId == colocationId && i.Status != "Completed" && i.DueDate.Date == DateTime.Today)
                 .OrderBy(i => i.DueDate)
                 .ToListAsync();
 
@@ -255,6 +267,9 @@ namespace Bayti.Controllers
                         Title = "Nouvelle tâche assignée",
                         Message = $"On vous a assigné la tâche : {instance.TaskTemplate.Title}. À faire pour le {instance.DueDate:dd/MM}.",
                         Type = "Info",
+                        ActionUrl = "/Tasks",
+                        RelatedEntityType = "TaskInstance",
+                        RelatedEntityId = instance.Id,
                         CreatedAt = DateTime.UtcNow
                     });
                     await _context.SaveChangesAsync();
@@ -290,7 +305,10 @@ namespace Bayti.Controllers
                     UserId = task.AssignedUserId.Value,
                     Title = "Rappel de tâche 🔔",
                     Message = $"N'oubliez pas de terminer : {task.TaskTemplate.Title}. L'échéance approche !",
-                    Type = "Warning", // Warning color to grab attention
+                    Type = "Warning",
+                    ActionUrl = "/Tasks",
+                    RelatedEntityType = "TaskInstance",
+                    RelatedEntityId = task.Id,
                     CreatedAt = DateTime.UtcNow
                 });
                 notifsSent++;

@@ -2,10 +2,16 @@
 @model IEnumerable<Bayti.Models.TaskInstance>
 @{
     ViewData["Title"] = "Mes Tâches du Jour";
-    var completedCount = Model.Count(t => t.Status == "Completed");
-    var totalCount = Model.Count();
-    var progress = totalCount > 0 ? (completedCount * 100 / totalCount) : 0;
     int currentUserId = int.Parse(User.FindFirst("UserId")?.Value ?? "0");
+    // Count only the current user's tasks for the progress bar
+    var myTasks = Model.Where(t => t.AssignedUserId == currentUserId).ToList();
+    var completedCount = myTasks.Count(t => t.Status == "Completed");
+    var totalCount = myTasks.Count;
+    var progress = totalCount > 0 ? (completedCount * 100 / totalCount) : 0;
+}
+
+@{
+    bool hasClaimedTask = false; // no longer used
 }
 
 <div class="page-wrap">
@@ -64,7 +70,10 @@
         <div class="tasks-grid">
             @foreach (var item in Model.OrderBy(t => t.Status == "Completed").ThenBy(t => t.DueDate))
             {
-                <div class="task-card @(item.Status == "Completed" ? "is-done" : "")">
+                bool isTakenByOther = item.AssignedUserId != null && item.AssignedUserId != currentUserId;
+                string cardClass = item.Status == "Completed" ? "is-done"
+                                 : isTakenByOther ? "is-locked" : "";
+                <div class="task-card @cardClass">
                     <div class="tc-icon">
                         @if (item.TaskTemplate.Category?.Icon?.StartsWith("fa-") == true) {
                             <i class="fa-solid @item.TaskTemplate.Category.Icon"></i>
@@ -89,6 +98,11 @@
                     <div class="tc-action">
                         @if (item.Status == "Completed") {
                             <div class="done-badge"><i class="fa-solid fa-circle-check"></i> Fait !</div>
+                        } else if (item.AssignedUserId != null && item.AssignedUserId != currentUserId) {
+                            <!-- Taken by another user: locked -->
+                            <div class="locked-badge">
+                                <i class="fa-solid fa-lock"></i> Déjà pris
+                            </div>
                         } else if (item.AssignedUserId == null) {
                             <form asp-action="Claim" asp-route-id="@item.Id" method="post">
                                 <button type="submit" class="btn-claim" title="S'attribuer cette tâche">
@@ -125,8 +139,9 @@
     transition: var(--t-spring);
     box-shadow: var(--shadow-xs);
 }
-.task-card:hover:not(.is-done) { transform: translateX(6px); border-color: var(--coral); box-shadow: var(--shadow-sm); }
+.task-card:hover:not(.is-done):not(.is-locked) { transform: translateX(6px); border-color: var(--coral); box-shadow: var(--shadow-sm); }
 .task-card.is-done { opacity: 0.55; background: var(--bg-2); }
+.task-card.is-locked { opacity: 0.5; background: var(--bg-2); border-style: dashed; cursor: default; }
 
 .tc-icon {
     width: 54px; height: 54px; border-radius: 16px;
@@ -162,4 +177,5 @@
 .btn-claim:hover { background: var(--coral); color: white; transform: scale(1.06); box-shadow: var(--shadow-coral-sm); }
 
 .done-badge { display: flex; align-items: center; gap: 6px; color: var(--green); font-weight: 800; font-size: 14px; white-space: nowrap; }
+.locked-badge { display: flex; align-items: center; gap: 6px; color: var(--ink-4); font-weight: 700; font-size: 13px; white-space: nowrap; background: var(--bg-3); padding: 8px 14px; border-radius: 10px; border: 1px solid var(--border); }
 </style>
