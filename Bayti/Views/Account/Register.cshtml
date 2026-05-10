@@ -13,48 +13,48 @@
         *, *::before, *::after { box-sizing: border-box; margin:0; padding:0; }
         body {
             min-height: 100vh;
-            background: linear-gradient(145deg, #1A1D2E 0%, #252941 50%, #1E2340 100%);
+            background: linear-gradient(135deg, #F8FAFC 0%, #E2E8F0 100%);
             font-family: var(--font-body);
             display: grid; place-items: center; padding: 32px 20px;
         }
         .register-card {
-            background: #13152B;
+            background: #FFFFFF;
             width: 100%; max-width: 560px;
             padding: 52px 48px;
             border-radius: 28px;
-            box-shadow: 0 30px 80px rgba(0,0,0,0.5);
-            border: 1px solid rgba(255,255,255,0.08);
+            box-shadow: 0 20px 60px rgba(15,23,42,0.08);
+            border: 1px solid #E2E8F0;
             position: relative; z-index: 1;
         }
         .reg-header { text-align:center; margin-bottom:32px; }
-        .reg-brand { font-family:var(--font-display); font-size:28px; font-weight:900; color:var(--coral); letter-spacing:-0.5px; margin-bottom:14px; }
-        .reg-title { font-family:var(--font-display); font-size:24px; font-weight:900; color:white; letter-spacing:-0.5px; margin-bottom:6px; }
-        .reg-sub { font-size:14px; color:rgba(255,255,255,0.45); }
+        .reg-logo-box { width: 64px; height: 64px; background: var(--grad-coral); border-radius: 18px; display: flex; align-items: center; justify-content: center; font-size: 28px; color: white; margin: 0 auto 16px; box-shadow: 0 6px 20px rgba(255,107,107,0.4); }
+        .reg-title { font-family:var(--font-display); font-size:24px; font-weight:900; color:#0F172A; letter-spacing:-0.5px; margin-bottom:6px; }
+        .reg-sub { font-size:14px; color:#64748B; }
         .form-group { margin-bottom:16px; }
-        .form-lbl { display:block; font-size:11px; font-weight:800; color:rgba(255,255,255,0.45); text-transform:uppercase; letter-spacing:0.8px; margin-bottom:8px; }
-        .form-inp { width:100%; padding:13px 16px; background:rgba(255,255,255,0.06); border:1.5px solid rgba(255,255,255,0.10); border-radius:12px; font-family:var(--font-body); font-size:14px; font-weight:500; color:white; transition:var(--t-fast); }
-        .form-inp:focus { outline:none; background:rgba(255,255,255,0.09); border-color:rgba(255,107,107,0.6); box-shadow:var(--coral-glow); }
-        .form-inp::placeholder { color:rgba(255,255,255,0.25); }
+        .form-lbl { display:block; font-size:11px; font-weight:800; color:#475569; text-transform:uppercase; letter-spacing:0.8px; margin-bottom:8px; }
+        .form-inp { width:100%; padding:13px 16px; background:#F8FAFC; border:1.5px solid #E2E8F0; border-radius:12px; font-family:var(--font-body); font-size:14px; font-weight:500; color:#0F172A; transition:var(--t-fast); }
+        .form-inp:focus { outline:none; background:#FFFFFF; border-color:#FF6B6B; box-shadow:0 0 0 4px rgba(255,107,107,0.15); }
+        .form-inp::placeholder { color:#94A3B8; }
         .form-row { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
         .av-section { margin-bottom:24px; }
-        .av-label { display:block; font-size:11px; font-weight:800; color:rgba(255,255,255,0.45); text-transform:uppercase; letter-spacing:0.8px; margin-bottom:10px; }
+        .av-label { display:block; font-size:11px; font-weight:800; color:#475569; text-transform:uppercase; letter-spacing:0.8px; margin-bottom:10px; }
         .av-grid { display:flex; flex-wrap:wrap; gap:10px; }
-        .av-opt { cursor:pointer; border-radius:12px; border:2.5px solid rgba(255,255,255,0.1); padding:3px; transition:var(--t-spring); position:relative; }
+        .av-opt { cursor:pointer; border-radius:12px; border:2.5px solid #E2E8F0; padding:3px; transition:var(--t-spring); position:relative; }
         .av-opt img { width:48px; height:48px; border-radius:10px; display:block; }
-        .av-opt:hover { transform:scale(1.06); border-color:rgba(255,255,255,0.3); }
-        .av-opt.active { border-color:var(--coral); box-shadow:var(--coral-glow); transform:scale(1.1); }
-        .av-opt.active::after { content:'✓'; position:absolute; top:-6px; right:-6px; width:18px; height:18px; background:var(--coral); color:white; border-radius:50%; font-size:10px; font-weight:900; display:flex; align-items:center; justify-content:center; border:2px solid #13152B; }
+        .av-opt:hover { transform:scale(1.06); border-color:#CBD5E1; }
+        .av-opt.active { border-color:#FF6B6B; box-shadow:0 0 0 4px rgba(255,107,107,0.15); transform:scale(1.1); }
+        .av-opt.active::after { content:'✓'; position:absolute; top:-6px; right:-6px; width:18px; height:18px; background:var(--coral); color:white; border-radius:50%; font-size:10px; font-weight:900; display:flex; align-items:center; justify-content:center; border:2px solid #FFFFFF; }
         .btn-submit { width:100%; padding:15px; background:var(--grad-coral); color:white; border:none; border-radius:14px; font-family:var(--font-display); font-size:16px; font-weight:800; cursor:pointer; transition:var(--t-spring); box-shadow:var(--shadow-coral-sm); margin-bottom:16px; }
         .btn-submit:hover { transform:translateY(-3px); box-shadow:var(--shadow-coral); }
-        .auth-foot { text-align:center; font-size:14px; color:rgba(255,255,255,0.4); font-weight:600; }
-        .auth-foot a { color:var(--coral-light); font-weight:800; }
-        .val-error { background:rgba(255,107,107,0.12); color:#FF9494; border:1px solid rgba(255,107,107,0.25); border-radius:10px; padding:12px 16px; font-size:13px; font-weight:600; margin-bottom:16px; }
+        .auth-foot { text-align:center; font-size:14px; color:#64748B; font-weight:600; }
+        .auth-foot a { color:var(--coral); font-weight:800; }
+        .val-error { background:rgba(255,107,107,0.1); color:#E11D48; border:1px solid rgba(255,107,107,0.2); border-radius:10px; padding:12px 16px; font-size:13px; font-weight:600; margin-bottom:16px; }
     </style>
 </head>
 <body>
     <div class="register-card">
         <div class="reg-header">
-            <div class="reg-brand">🏠 Bayti</div>
+            <div class="reg-logo-box"><i class="fa-solid fa-house-chimney"></i></div>
             <h1 class="reg-title">Créer un compte</h1>
             <p class="reg-sub">Rejoignez votre colocation et gérez le ménage ensemble.</p>
         </div>

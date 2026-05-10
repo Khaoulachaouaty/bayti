@@ -13,7 +13,7 @@
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
         body {
             min-height: 100vh;
-            background: linear-gradient(145deg, #1A1D2E 0%, #252941 50%, #1E2340 100%);
+            background: linear-gradient(135deg, #F8FAFC 0%, #E2E8F0 100%);
             font-family: var(--font-body);
             display: grid; place-items: center; padding: 20px;
             overflow: hidden; position: relative;
@@ -42,17 +42,18 @@
 
         /* Background glow orbs */
         .glow-orb { position: fixed; border-radius: 50%; filter: blur(80px); pointer-events: none; z-index: 0; }
-        .glow-orb-1 { width: 500px; height: 500px; background: rgba(255,107,107,0.12); top: -150px; left: -100px; }
-        .glow-orb-2 { width: 400px; height: 400px; background: rgba(0,201,167,0.10); bottom: -100px; right: -80px; }
-        .glow-orb-3 { width: 300px; height: 300px; background: rgba(167,139,250,0.09); top: 50%; left: 50%; transform: translate(-50%,-50%); }
+        .glow-orb-1 { width: 500px; height: 500px; background: rgba(255,107,107,0.15); top: -150px; left: -100px; }
+        .glow-orb-2 { width: 400px; height: 400px; background: rgba(0,201,167,0.12); bottom: -100px; right: -80px; }
+        .glow-orb-3 { width: 300px; height: 300px; background: rgba(167,139,250,0.10); top: 50%; left: 50%; transform: translate(-50%,-50%); }
 
         /* Auth shell */
         .auth-shell {
             display: grid; grid-template-columns: 1fr 1fr;
             width: 100%; max-width: 920px;
             border-radius: 32px; overflow: hidden;
-            box-shadow: 0 30px 80px rgba(0,0,0,0.5);
+            box-shadow: 0 20px 60px rgba(15,23,42,0.08);
             position: relative; z-index: 1;
+            background: #FFFFFF;
         }
 
         /* LEFT */
@@ -65,8 +66,8 @@
         .auth-left::before { content:''; position:absolute; width:320px; height:320px; background:rgba(255,255,255,0.09); border-radius:50%; top:-120px; right:-100px; }
         .auth-left::after  { content:''; position:absolute; width:240px; height:240px; background:rgba(255,255,255,0.06); border-radius:50%; bottom:-80px; left:-50px; }
 
-        .al-logo { position: relative; z-index: 1; }
-        .al-logo-icon { width: 56px; height: 56px; background: rgba(255,255,255,0.25); border-radius: 18px; display: flex; align-items: center; justify-content: center; font-size: 26px; margin-bottom: 14px; backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.3); }
+        .al-logo { position: relative; z-index: 1; margin-bottom: 30px; }
+        .al-logo-icon { width: 56px; height: 56px; background: var(--grad-coral); border-radius: 18px; display: flex; align-items: center; justify-content: center; font-size: 26px; color: white; margin-bottom: 14px; box-shadow: 0 6px 20px rgba(255,107,107,0.4); }
         .al-logo-name { font-family: 'Nunito', sans-serif; font-size: 34px; font-weight: 900; color: white; letter-spacing: -1px; line-height: 1; }
         .al-logo-tag { font-size: 13px; color: rgba(255,255,255,0.7); font-weight: 500; margin-top: 4px; }
 
@@ -80,32 +81,32 @@
 
         /* RIGHT */
         .auth-right {
-            background: #13152B;
+            background: #FFFFFF;
             padding: 56px 52px;
             display: flex; flex-direction: column; justify-content: center;
         }
         .auth-welcome { font-size: 13px; font-weight: 700; color: var(--coral); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 10px; }
-        .auth-title { font-family: 'Nunito', sans-serif; font-size: 28px; font-weight: 900; color: white; letter-spacing: -0.5px; margin-bottom: 6px; }
-        .auth-sub { font-size: 14px; color: rgba(255,255,255,0.45); margin-bottom: 36px; }
+        .auth-title { font-family: 'Nunito', sans-serif; font-size: 28px; font-weight: 900; color: #0F172A; letter-spacing: -0.5px; margin-bottom: 6px; }
+        .auth-sub { font-size: 14px; color: #64748B; margin-bottom: 36px; }
 
         .form-group { margin-bottom: 20px; }
-        .form-lbl { display: block; font-size: 11px; font-weight: 800; color: rgba(255,255,255,0.45); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 8px; }
+        .form-lbl { display: block; font-size: 11px; font-weight: 800; color: #475569; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 8px; }
         .form-inp {
             width: 100%; padding: 14px 18px;
-            background: rgba(255,255,255,0.06);
-            border: 1.5px solid rgba(255,255,255,0.10);
+            background: #F8FAFC;
+            border: 1.5px solid #E2E8F0;
             border-radius: 12px;
             font-family: 'Plus Jakarta Sans', sans-serif;
-            font-size: 14px; font-weight: 500; color: white;
+            font-size: 14px; font-weight: 500; color: #0F172A;
             transition: all 0.2s;
         }
-        .form-inp:focus { outline: none; background: rgba(255,255,255,0.09); border-color: rgba(255,107,107,0.6); box-shadow: 0 0 0 4px rgba(255,107,107,0.12); }
-        .form-inp::placeholder { color: rgba(255,255,255,0.25); }
+        .form-inp:focus { outline: none; background: #FFFFFF; border-color: #FF6B6B; box-shadow: 0 0 0 4px rgba(255,107,107,0.15); }
+        .form-inp::placeholder { color: #94A3B8; }
 
         .auth-opts { display: flex; justify-content: space-between; align-items: center; margin-bottom: 26px; font-size: 13px; font-weight: 600; }
-        .remember { display: flex; align-items: center; gap: 8px; color: rgba(255,255,255,0.45); cursor: pointer; }
+        .remember { display: flex; align-items: center; gap: 8px; color: #64748B; cursor: pointer; }
         .remember input { width: 16px; height: 16px; accent-color: var(--coral); }
-        .forgot { color: var(--coral-light); text-decoration: none; }
+        .forgot { color: var(--coral); text-decoration: none; }
         .forgot:hover { text-decoration: underline; }
 
         .btn-submit {
@@ -119,11 +120,11 @@
         }
         .btn-submit:hover { transform: translateY(-3px) scale(1.01); box-shadow: 0 12px 36px rgba(255,107,107,0.45); }
 
-        .auth-foot { margin-top: 22px; text-align: center; font-size: 14px; color: rgba(255,255,255,0.40); font-weight: 600; }
-        .auth-foot a { color: var(--coral-light); font-weight: 800; }
+        .auth-foot { margin-top: 22px; text-align: center; font-size: 14px; color: #64748B; font-weight: 600; }
+        .auth-foot a { color: var(--coral); font-weight: 800; }
         .auth-foot a:hover { text-decoration: underline; }
 
-        .val-error { background: rgba(255,107,107,0.12); color: #FF9494; border: 1px solid rgba(255,107,107,0.25); border-radius: 10px; padding: 12px 16px; font-size: 13px; font-weight: 600; margin-bottom: 16px; }
+        .val-error { background: rgba(255,107,107,0.1); color: #E11D48; border: 1px solid rgba(255,107,107,0.2); border-radius: 10px; padding: 12px 16px; font-size: 13px; font-weight: 600; margin-bottom: 16px; }
     </style>
 </head>
 <body>
@@ -142,7 +143,7 @@
     <div class="auth-shell">
         <div class="auth-left">
             <div class="al-logo">
-                <div class="al-logo-icon">🏠</div>
+                <div class="al-logo-icon"><i class="fa-solid fa-house-chimney"></i></div>
                 <div class="al-logo-name">Bayti</div>
                 <div class="al-logo-tag">Gestion de colocation zen</div>
             </div>
