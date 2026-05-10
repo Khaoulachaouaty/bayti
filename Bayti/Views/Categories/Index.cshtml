@@ -14,7 +14,7 @@
             <p style="font-size:14px; color:var(--ink-3); margin-top:4px;">Structurez les tâches de votre foyer par thématiques.</p>
         </div>
         @if (isAdmin) {
-            <a asp-action="Create" class="btn btn-mint">
+            <a asp-action="Create" class="btn btn-coral">
                 <i class="fa-solid fa-plus"></i> Nouveau domaine
             </a>
         }
@@ -121,7 +121,7 @@ window.addEventListener('click', (e) => {
     position: absolute;
     top: -20px; right: -20px;
     width: 100px; height: 100px;
-    background: var(--mint-bg);
+    background: var(--coral-bg);
     border-radius: 50%;
     z-index: 0;
     transition: var(--t-base);
@@ -130,13 +130,13 @@ window.addEventListener('click', (e) => {
 
 .cat-card:hover {
     transform: translateY(-8px);
-    border-color: var(--mint);
-    box-shadow: 0 20px 40px rgba(0, 201, 167, 0.12);
+    border-color: var(--coral);
+    box-shadow: 0 20px 40px rgba(255, 107, 107, 0.12);
 }
 
 .cat-card:hover::before {
     transform: scale(1.5);
-    background: var(--mint-light);
+    background: var(--coral-light);
     opacity: 0.2;
 }
 
@@ -157,19 +157,19 @@ window.addEventListener('click', (e) => {
 
 .cat-icon-box {
     width: 54px; height: 54px;
-    background: var(--mint-bg);
-    color: var(--mint);
+    background: var(--coral-bg);
+    color: var(--coral);
     border-radius: 16px;
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 24px;
-    border: 1.5px solid rgba(0, 201, 167, 0.15);
+    border: 1.5px solid rgba(255, 107, 107, 0.15);
     transition: var(--t-base);
 }
 
 .cat-card:hover .cat-icon-box {
-    background: var(--mint);
+    background: var(--coral);
     color: white;
     transform: rotate(-5deg) scale(1.1);
 }
