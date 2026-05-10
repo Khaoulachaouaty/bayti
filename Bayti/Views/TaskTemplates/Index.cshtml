@@ -71,13 +71,15 @@
                                 <span class="tt-status-dot"></span>
                                 @(item.IsPaused ? "En pause" : "Active")
                             </div>
-                            <div class="tt-actions">
-                                <a asp-action="TogglePause" asp-route-id="@item.Id" class="tt-btn @(item.IsPaused ? "tt-btn-resume" : "tt-btn-pause")" title="@(item.IsPaused ? "Reprendre" : "Pause")">
-                                    <i class="fa-solid @(item.IsPaused ? "fa-play" : "fa-pause")"></i>
-                                </a>
-                                <a asp-action="Edit" asp-route-id="@item.Id" class="tt-btn tt-btn-edit"><i class="fa-solid fa-pen"></i></a>
-                                <button type="button" onclick="openDangerModal('@Url.Action("Delete", "TaskTemplates", new { id = item.Id })', 'Supprimer la règle \'@item.Title\' ?')" class="tt-btn tt-btn-del"><i class="fa-solid fa-trash-can"></i></button>
-                            </div>
+                            @if (isAdmin) {
+                                <div class="tt-actions">
+                                    <a asp-action="TogglePause" asp-route-id="@item.Id" class="tt-btn @(item.IsPaused ? "tt-btn-resume" : "tt-btn-pause")" title="@(item.IsPaused ? "Reprendre" : "Pause")">
+                                        <i class="fa-solid @(item.IsPaused ? "fa-play" : "fa-pause")"></i>
+                                    </a>
+                                    <a asp-action="Edit" asp-route-id="@item.Id" class="tt-btn tt-btn-edit"><i class="fa-solid fa-pen"></i></a>
+                                    <button type="button" onclick="openDangerModal('@Url.Action("Delete", "TaskTemplates", new { id = item.Id })', 'Supprimer la règle \'@item.Title\' ?')" class="tt-btn tt-btn-del"><i class="fa-solid fa-trash-can"></i></button>
+                                </div>
+                            }
                         </div>
                     </div>
                 }

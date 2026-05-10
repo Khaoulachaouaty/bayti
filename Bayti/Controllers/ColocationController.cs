@@ -177,6 +177,19 @@ namespace Bayti.Controllers
             var colocation = await _context.Colocations.FindAsync(user.ColocationId);
             if (colocation != null && new[] { "Auto", "Manuel", "Participatif" }.Contains(assignmentMode))
             {
+                if (colocation.AssignmentMode != assignmentMode && (assignmentMode == "Manuel" || assignmentMode == "Participatif"))
+                {
+                    var pendingTasks = await _context.TaskInstances
+                        .Include(t => t.TaskTemplate)
+                        .Where(t => t.TaskTemplate.ColocationId == colocation.Id && t.Status == "Pending")
+                        .ToListAsync();
+
+                    foreach (var task in pendingTasks)
+                    {
+                        task.AssignedUserId = null;
+                    }
+                }
+
                 colocation.AssignmentMode = assignmentMode;
                 await _context.SaveChangesAsync();
             }

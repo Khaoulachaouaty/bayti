@@ -17,12 +17,20 @@
                 <h1 class="page-title">🧹 Mes Tâches</h1>
                 <p class="page-subtitle">@DateTime.Now.ToString("dddd dd MMMM", new System.Globalization.CultureInfo("fr-FR"))</p>
             </div>
-            @if (User.FindFirst("IsAdmin")?.Value == "True" && ViewBag.AssignmentMode == "Manuel")
-            {
-                <a asp-action="Manage" class="btn btn-ghost">
-                    <i class="fa-solid fa-crown"></i> Gérer toutes
-                </a>
-            }
+            <div style="display:flex; gap:12px; align-items:center;">
+                @if (User.FindFirst("IsAdmin")?.Value == "True")
+                {
+                    <a asp-action="GenerateTestTasks" class="btn btn-coral" title="Générer les tâches d'aujourd'hui">
+                        <i class="fa-solid fa-rotate"></i> Générer
+                    </a>
+                }
+                @if (User.FindFirst("IsAdmin")?.Value == "True" && ViewBag.AssignmentMode == "Manuel")
+                {
+                    <a asp-action="Manage" class="btn btn-ghost">
+                        <i class="fa-solid fa-crown"></i> Gérer toutes
+                    </a>
+                }
+            </div>
         </div>
     </div>
 

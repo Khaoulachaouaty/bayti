@@ -136,6 +136,9 @@ namespace Bayti.Controllers
                 AvatarUrl = user.AvatarUrl ?? "/images/avatars/avatar1.png"
             };
 
+            ViewBag.Points = user.Points;
+            ViewBag.IsAdmin = user.IsAdmin;
+
             return View(model);
         }
 

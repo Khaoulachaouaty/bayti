@@ -11,9 +11,14 @@
             <h1 class="page-title">👑 Gérer les affectations</h1>
             <p class="page-subtitle">Mode Manuel : Distribuez les tâches du jour aux membres de votre tribu.</p>
         </div>
-        <a asp-action="Index" class="btn btn-ghost">
-            <i class="fa-solid fa-arrow-left"></i> Retour aux tâches
-        </a>
+        <div style="display:flex; gap:12px; align-items:center;">
+            <a asp-action="GenerateTestTasks" class="btn btn-coral" title="Générer les tâches d'aujourd'hui">
+                <i class="fa-solid fa-rotate"></i> Générer
+            </a>
+            <a asp-action="Index" class="btn btn-ghost">
+                <i class="fa-solid fa-arrow-left"></i> Retour aux tâches
+            </a>
+        </div>
     </div>
 
     @if (!Model.Any())

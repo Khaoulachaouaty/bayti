@@ -35,6 +35,8 @@ namespace Bayti.Controllers
 
         public async Task<IActionResult> Create()
         {
+            if (User.FindFirstValue("IsAdmin") != "True") return Forbid();
+
             var colocationIdStr = User.FindFirstValue("ColocationId");
             if (string.IsNullOrEmpty(colocationIdStr)) return RedirectToAction("Index", "Home");
 
@@ -51,6 +53,8 @@ namespace Bayti.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(TaskTemplate model)
         {
+            if (User.FindFirstValue("IsAdmin") != "True") return Forbid();
+
             var colocationIdStr = User.FindFirstValue("ColocationId");
             var userIdStr = User.FindFirstValue("UserId");
             
@@ -99,6 +103,7 @@ namespace Bayti.Controllers
 
         public async Task<IActionResult> Edit(int? id)
         {
+            if (User.FindFirstValue("IsAdmin") != "True") return Forbid();
             if (id == null) return NotFound();
 
             var colocationIdStr = User.FindFirstValue("ColocationId");
@@ -118,6 +123,7 @@ namespace Bayti.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, TaskTemplate model)
         {
+            if (User.FindFirstValue("IsAdmin") != "True") return Forbid();
             if (id != model.Id) return NotFound();
 
             var colocationIdStr = User.FindFirstValue("ColocationId");
@@ -165,6 +171,8 @@ namespace Bayti.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(int id)
         {
+            if (User.FindFirstValue("IsAdmin") != "True") return Forbid();
+
             var colocationIdStr = User.FindFirstValue("ColocationId");
             int colocationId = int.Parse(colocationIdStr);
 
@@ -179,6 +187,8 @@ namespace Bayti.Controllers
 
         public async Task<IActionResult> TogglePause(int id)
         {
+            if (User.FindFirstValue("IsAdmin") != "True") return Forbid();
+
             var colocationIdStr = User.FindFirstValue("ColocationId");
             int colocationId = int.Parse(colocationIdStr);
 
