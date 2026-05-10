@@ -18,27 +18,39 @@
             display: grid; place-items: center; padding: 20px;
             overflow: hidden; position: relative;
         }
-
         /* Floating bubbles */
         .login-bubbles { position: fixed; inset: 0; pointer-events: none; z-index: 0; }
         .lb {
             position: absolute; border-radius: 50%;
-            animation: lbFloat linear infinite;
+            background: radial-gradient(circle at 25% 25%, rgba(255,255,255,0.4) 1%, rgba(255,255,255,0.02) 30%, transparent 60%);
+            box-shadow: 
+                inset 0 0 6px rgba(255, 255, 255, 0.2),
+                inset 4px 0 10px rgba(255, 107, 107, 0.1),
+                inset -4px 0 10px rgba(78, 205, 196, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            animation: lbFloat linear infinite, wobbleBubble 6s ease-in-out infinite alternate;
+            backdrop-filter: blur(1px);
         }
-        .lb:nth-child(1)  { width:70px;  height:70px;  left:8%;   bottom:-80px; animation-duration:20s; animation-delay:0s;   background: radial-gradient(circle at 30% 30%, rgba(255,107,107,0.35), rgba(255,107,107,0.05)); border:1px solid rgba(255,107,107,0.2); }
-        .lb:nth-child(2)  { width:110px; height:110px; left:18%;  bottom:-120px; animation-duration:25s; animation-delay:4s;  background: radial-gradient(circle at 30% 30%, rgba(0,201,167,0.30), rgba(0,201,167,0.04)); border:1px solid rgba(0,201,167,0.18); }
-        .lb:nth-child(3)  { width:50px;  height:50px;  left:30%;  bottom:-60px; animation-duration:18s; animation-delay:2s;   background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.20), rgba(255,255,255,0.03)); border:1px solid rgba(255,255,255,0.12); }
-        .lb:nth-child(4)  { width:80px;  height:80px;  left:48%;  bottom:-90px; animation-duration:22s; animation-delay:7s;   background: radial-gradient(circle at 30% 30%, rgba(167,139,250,0.30), rgba(167,139,250,0.04)); border:1px solid rgba(167,139,250,0.18); }
-        .lb:nth-child(5)  { width:40px;  height:40px;  left:62%;  bottom:-50px; animation-duration:16s; animation-delay:1s;   background: radial-gradient(circle at 30% 30%, rgba(255,107,107,0.25), rgba(255,107,107,0.04)); border:1px solid rgba(255,107,107,0.15); }
-        .lb:nth-child(6)  { width:95px;  height:95px;  left:74%;  bottom:-110px; animation-duration:28s; animation-delay:5s;  background: radial-gradient(circle at 30% 30%, rgba(0,201,167,0.28), rgba(0,201,167,0.04)); border:1px solid rgba(0,201,167,0.16); }
-        .lb:nth-child(7)  { width:60px;  height:60px;  left:86%;  bottom:-70px; animation-duration:19s; animation-delay:9s;   background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.18), rgba(255,255,255,0.02)); border:1px solid rgba(255,255,255,0.10); }
-        .lb:nth-child(8)  { width:35px;  height:35px;  left:93%;  bottom:-45px; animation-duration:14s; animation-delay:3s;   background: radial-gradient(circle at 30% 30%, rgba(245,166,35,0.30), rgba(245,166,35,0.04)); border:1px solid rgba(245,166,35,0.18); }
-        @@keyframes lbFloat {
-            0%   { transform: translateY(0) scale(0.9); opacity: 0; }
+        @keyframes wobbleBubble {
+            0% { border-radius: 50% 50% 50% 50%; }
+            50% { border-radius: 48% 52% 51% 49%; }
+            100% { border-radius: 52% 48% 49% 51%; }
+        }
+        .lb:nth-child(1)  { width:70px;  height:70px;  left:8%;   bottom:-80px; animation-duration:20s, 6s; animation-delay:0s, 0s;   }
+        .lb:nth-child(2)  { width:110px; height:110px; left:18%;  bottom:-120px; animation-duration:25s, 5s; animation-delay:4s, 1s;  }
+        .lb:nth-child(3)  { width:50px;  height:50px;  left:30%;  bottom:-60px; animation-duration:18s, 7s; animation-delay:2s, 2s;   }
+        .lb:nth-child(4)  { width:80px;  height:80px;  left:48%;  bottom:-90px; animation-duration:22s, 6.5s; animation-delay:7s, 0s; }
+        .lb:nth-child(5)  { width:40px;  height:40px;  left:62%;  bottom:-50px; animation-duration:16s, 5.5s; animation-delay:1s, 1.5s; }
+        .lb:nth-child(6)  { width:95px;  height:95px;  left:74%;  bottom:-110px; animation-duration:28s, 6s; animation-delay:5s, 2s;  }
+        .lb:nth-child(7)  { width:60px;  height:60px;  left:86%;  bottom:-70px; animation-duration:19s, 6.2s; animation-delay:9s, 0.5s; }
+        .lb:nth-child(8)  { width:35px;  height:35px;  left:93%;  bottom:-45px; animation-duration:14s, 5s; animation-delay:3s, 1s;   }
+        @keyframes lbFloat {
+            0%   { transform: translateY(0) scale(0.9) rotate(0deg); opacity: 0; }
             5%   { opacity: 1; }
             95%  { opacity: 0.9; }
-            100% { transform: translateY(-105vh) scale(1.1); opacity: 0; }
+            100% { transform: translateY(-105vh) scale(1.1) rotate(180deg); opacity: 0; }
         }
+
 
         /* Background glow orbs */
         .glow-orb { position: fixed; border-radius: 50%; filter: blur(80px); pointer-events: none; z-index: 0; }

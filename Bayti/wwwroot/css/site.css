@@ -11,31 +11,45 @@ a:hover { color: var(--coral-dark); }
 /* ── FLOATING BUBBLES (background decoration) ─── */
 .bubbles-bg {
     position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    pointer-events: none; z-index: 0; overflow: hidden;
+    pointer-events: none; z-index: 100; overflow: hidden; /* Flotte devant l'app */
+    opacity: 0.6; /* Plus doux */
 }
 .bubble {
     position: absolute; border-radius: 50%;
-    background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.6), rgba(255,107,107,0.12));
-    border: 1px solid rgba(255,255,255,0.4);
-    animation: floatBubble linear infinite;
-    backdrop-filter: blur(2px);
+    /* Reflet de lumière très subtil */
+    background: radial-gradient(circle at 25% 25%, rgba(255,255,255,0.3) 1%, rgba(255,255,255,0.02) 30%, transparent 60%);
+    /* Iridescence ultra douce */
+    box-shadow: 
+        inset 0 0 6px rgba(255, 255, 255, 0.15),
+        inset 4px 0 10px rgba(255, 107, 107, 0.05),
+        inset -4px 0 10px rgba(78, 205, 196, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    animation: floatBubble linear infinite, wobbleBubble 6s ease-in-out infinite alternate;
+    backdrop-filter: blur(1px);
 }
-.bubble:nth-child(1)  { width:60px;  height:60px;  left:5%;   animation-duration:18s; animation-delay:0s;   }
-.bubble:nth-child(2)  { width:90px;  height:90px;  left:12%;  animation-duration:22s; animation-delay:3s;   background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.5), rgba(0,201,167,0.12)); }
-.bubble:nth-child(3)  { width:45px;  height:45px;  left:22%;  animation-duration:16s; animation-delay:7s;   }
-.bubble:nth-child(4)  { width:70px;  height:70px;  left:35%;  animation-duration:20s; animation-delay:1s;   background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.5), rgba(167,139,250,0.14)); }
-.bubble:nth-child(5)  { width:35px;  height:35px;  left:50%;  animation-duration:14s; animation-delay:5s;   }
-.bubble:nth-child(6)  { width:80px;  height:80px;  left:62%;  animation-duration:24s; animation-delay:2s;   background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.5), rgba(0,201,167,0.14)); }
-.bubble:nth-child(7)  { width:50px;  height:50px;  left:75%;  animation-duration:17s; animation-delay:9s;   }
-.bubble:nth-child(8)  { width:100px; height:100px; left:85%;  animation-duration:26s; animation-delay:4s;   background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.4), rgba(255,107,107,0.10)); }
-.bubble:nth-child(9)  { width:42px;  height:42px;  left:92%;  animation-duration:13s; animation-delay:8s;   }
-.bubble:nth-child(10) { width:65px;  height:65px;  left:28%;  animation-duration:21s; animation-delay:6s;   background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.5), rgba(245,166,35,0.12)); }
+
+@keyframes wobbleBubble {
+    0% { border-radius: 50% 50% 50% 50%; }
+    50% { border-radius: 48% 52% 51% 49%; }
+    100% { border-radius: 52% 48% 49% 51%; }
+}
+
+.bubble:nth-child(1)  { width:60px;  height:60px;  left:8%;   animation-duration:35s, 6s; animation-delay:0s, 0s;   }
+.bubble:nth-child(2)  { width:120px; height:120px; left:18%;  animation-duration:45s, 5s; animation-delay:3s, 1s;   }
+.bubble:nth-child(3)  { width:45px;  height:45px;  left:30%;  animation-duration:30s, 7s; animation-delay:7s, 2s;   }
+.bubble:nth-child(4)  { width:80px;  height:80px;  left:45%;  animation-duration:38s, 6.5s; animation-delay:1s, 0s; }
+.bubble:nth-child(5)  { width:35px;  height:35px;  left:55%;  animation-duration:28s, 5.5s; animation-delay:5s, 1.5s; }
+.bubble:nth-child(6)  { width:90px;  height:90px;  left:68%;  animation-duration:42s, 6s; animation-delay:2s, 2s;   }
+.bubble:nth-child(7)  { width:50px;  height:50px;  left:78%;  animation-duration:32s, 6.2s; animation-delay:9s, 0.5s; }
+.bubble:nth-child(8)  { width:110px; height:110px; left:88%;  animation-duration:48s, 5s; animation-delay:4s, 1s;   }
+.bubble:nth-child(9)  { width:40px;  height:40px;  left:95%;  animation-duration:25s, 7s; animation-delay:8s, 2s;   }
+.bubble:nth-child(10) { width:75px;  height:75px;  left:38%;  animation-duration:36s, 5.8s; animation-delay:6s, 0s; }
 
 @keyframes floatBubble {
-    0%   { transform: translateY(110vh) scale(0.8) rotate(0deg); opacity: 0; }
-    5%   { opacity: 1; }
+    0%   { transform: translateY(110vh) scale(0.9) rotate(0deg); opacity: 0; }
+    10%  { opacity: 0.8; }
     90%  { opacity: 0.8; }
-    100% { transform: translateY(-15vh) scale(1.1) rotate(360deg); opacity: 0; }
+    100% { transform: translateY(-15vh) scale(1.05) rotate(180deg); opacity: 0; }
 }
 
 /* ── APP SHELL ────────────────────────────────── */
