@@ -49,5 +49,7 @@ namespace Bayti.Models
         public virtual ApplicationUser ClaimedBy { get; set; }
 
         public DateTime? ClaimedAt { get; set; }
+
+        public DateTime? LastReminderSent { get; set; }
     }
 }

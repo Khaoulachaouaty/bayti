@@ -21,6 +21,8 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.SlidingExpiration = true;
     });
 
+builder.Services.AddHostedService<Bayti.Services.TaskReminderService>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -68,6 +70,9 @@ using (var scope = app.Services.CreateScope())
         // Users
         db.ExecuteSqlRaw("IF COL_LENGTH('Users', 'AvatarEmoji') IS NULL ALTER TABLE Users ADD AvatarEmoji NVARCHAR(10) NOT NULL DEFAULT '👤';");
         db.ExecuteSqlRaw("IF COL_LENGTH('Users', 'AvatarColor') IS NULL ALTER TABLE Users ADD AvatarColor NVARCHAR(20) NOT NULL DEFAULT 'indigo';");
+
+        // TaskInstances - LastReminderSent
+        db.ExecuteSqlRaw("IF COL_LENGTH('TaskInstances', 'LastReminderSent') IS NULL ALTER TABLE TaskInstances ADD LastReminderSent DATETIME NULL;");
     }
     catch (Exception ex)
     {

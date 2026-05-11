@@ -190,14 +190,28 @@ namespace Bayti.Controllers
                     int? assignedUserId = null;
                     if (mode == "Auto")
                     {
-                        if (availableUserIds.Any())
+                        // L'affectation se réalise ici : le système cherche le membre le moins occupé aujourd'hui
+                        var candidateIds = availableUserIds.Any() ? availableUserIds : members.Select(m => m.Id).ToList();
+                        
+                        if (candidateIds.Any())
                         {
-                            assignedUserId = availableUserIds[random.Next(availableUserIds.Count)];
-                        }
-                        else if (members.Any())
-                        {
-                            // Fallback if no one explicitly available
-                            assignedUserId = members[random.Next(members.Count)].Id;
+                            // On compte combien de tâches chaque candidat a déjà aujourd'hui
+                            var counts = await _context.TaskInstances
+                                .Where(i => candidateIds.Contains(i.AssignedUserId ?? 0) && i.DueDate.Date == DateTime.Today)
+                                .GroupBy(i => i.AssignedUserId)
+                                .Select(g => new { UserId = g.Key, Count = g.Count() })
+                                .ToListAsync();
+
+                            // On trouve le minimum de tâches assignées
+                            int minTasks = counts.Any() && counts.Count == candidateIds.Count ? counts.Min(c => c.Count) : 0;
+                            
+                            // On filtre les candidats qui ont ce minimum (ceux qui n'ont rien sont à 0)
+                            var bestCandidates = candidateIds
+                                .Where(id => !counts.Any(c => c.UserId == id) || counts.First(c => c.UserId == id).Count == minTasks)
+                                .ToList();
+
+                            // On en choisit un au hasard parmi les plus "libres"
+                            assignedUserId = bestCandidates[random.Next(bestCandidates.Count)];
                         }
                     }
 

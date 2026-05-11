@@ -120,6 +120,21 @@
                 <span>Boutique 🎁</span>
             </a>
 
+            @{
+                int unreadCount = 0;
+                if (!string.IsNullOrEmpty(uid)) {
+                    unreadCount = DbContext.Notifications.Count(n => n.UserId == int.Parse(uid) && !n.IsRead);
+                }
+            }
+            <a class="sb-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Notifications" ? "active" : "")"
+               asp-controller="Notifications" asp-action="Index">
+                <i class="fa-solid fa-bell sb-link-icon"></i>
+                <span>Notifications</span>
+                @if (unreadCount > 0) {
+                    <span class="badge badge-coral" style="margin-left:auto; border-radius:50%; width:20px; height:20px; display:flex; align-items:center; justify-content:center; padding:0; font-size:10px;">@unreadCount</span>
+                }
+            </a>
+
         </nav>
 
         <!-- User Footer -->

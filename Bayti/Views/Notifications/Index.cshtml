@@ -35,7 +35,8 @@
     } else {
         <div class="notif-list">
             @foreach (var notif in Model) {
-                <div class="notif-card @(notif.IsRead ? "is-read" : "is-unread")">
+                <div class="notif-card @(notif.IsRead ? "is-read" : "is-unread") @(string.IsNullOrEmpty(notif.ActionUrl) || notif.ActionUrl == "/" ? "" : "is-clickable")"
+                     @(string.IsNullOrEmpty(notif.ActionUrl) || notif.ActionUrl == "/" ? "" : $"onclick=window.location.href='{notif.ActionUrl}'")>
                     @if (!notif.IsRead) {
                         <div class="notif-dot"></div>
                     }
@@ -56,8 +57,8 @@
                         <p class="notif-msg">@notif.Message</p>
                     </div>
                     @if (!notif.IsRead) {
-                        <form asp-action="MarkAsRead" asp-route-id="@notif.Id" method="post">
-                            <button type="submit" class="notif-read-btn" title="Marquer comme lu">
+                        <form asp-action="MarkAsRead" asp-route-id="@notif.Id" method="post" style="z-index: 10;">
+                            <button type="submit" class="notif-read-btn" title="Marquer comme lu" onclick="event.stopPropagation();">
                                 <i class="fa-solid fa-check"></i>
                             </button>
                         </form>
@@ -80,6 +81,7 @@
 .notif-card:hover { box-shadow: var(--shadow-sm); transform: translateX(4px); }
 .notif-card.is-unread { background: linear-gradient(135deg, #FFF8F5, #FFFFFF); border-color: rgba(255,107,107,0.22); }
 .notif-card.is-read { opacity: 0.65; }
+.notif-card.is-clickable { cursor: pointer; }
 
 .notif-dot { position: absolute; left: -5px; top: 50%; transform: translateY(-50%); width: 10px; height: 10px; background: var(--coral); border-radius: 50%; box-shadow: 0 0 0 3px var(--coral-bg); }
 
