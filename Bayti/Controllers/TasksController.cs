@@ -236,6 +236,17 @@ namespace Bayti.Controllers
                             assignedUserId = bestCandidates[random.Next(bestCandidates.Count)];
                             currentAssignments[assignedUserId]++;
                             assignedCount++;
+
+                            // Send assignment notification
+                            _context.Notifications.Add(new Notification
+                            {
+                                UserId = assignedUserId.Value,
+                                Title = "Nouvelle mission ! ✨",
+                                Message = $"Une nouvelle tâche vous a été attribuée : {t.Title}.",
+                                Type = "Info",
+                                ActionUrl = "/Tasks",
+                                CreatedAt = DateTime.UtcNow
+                            });
                         }
                     }
 
@@ -297,6 +308,17 @@ namespace Bayti.Controllers
                                 currentAssignments[existingTask.AssignedUserId]++;
                                 assignedCount++;
                                 createdCount++;
+
+                                // Send assignment notification for repaired task
+                                _context.Notifications.Add(new Notification
+                                {
+                                    UserId = existingTask.AssignedUserId.Value,
+                                    Title = "Mission assignée ! 🧹",
+                                    Message = $"La tâche '{t.Title}' vous a été assignée.",
+                                    Type = "Info",
+                                    ActionUrl = "/Tasks",
+                                    CreatedAt = DateTime.UtcNow
+                                });
                             }
                         }
                     }
