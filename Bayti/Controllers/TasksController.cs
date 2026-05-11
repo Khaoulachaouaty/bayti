@@ -46,7 +46,7 @@ namespace Bayti.Controllers
             }
             else
             {
-                // Auto or Manuel: show only tasks assigned to the current user for TODAY (including Completed ones)
+                // Auto or Manuel: show strictly tasks assigned to the current user for TODAY
                 tasksQuery = _context.TaskInstances
                     .Include(i => i.TaskTemplate)
                         .ThenInclude(t => t.Category)
@@ -56,6 +56,13 @@ namespace Bayti.Controllers
             }
 
             var tasks = await tasksQuery.OrderBy(i => i.DueDate).ToListAsync();
+
+            if (User.FindFirstValue("IsAdmin") == "True")
+            {
+                ViewBag.AllTasks = await _context.TaskInstances
+                    .Where(i => i.TaskTemplate.ColocationId == colocationId && i.DueDate.Date == today)
+                    .ToListAsync();
+            }
 
             ViewBag.CurrentUserId = userId;
 
@@ -132,14 +139,20 @@ namespace Bayti.Controllers
         {
             var colocationIdStr = User.FindFirstValue("ColocationId");
             int colocationId = int.Parse(colocationIdStr);
-            var colocation = await _context.Colocations.Include(c => c.Members).FirstOrDefaultAsync(c => c.Id == colocationId);
+            var colocation = await _context.Colocations.FirstOrDefaultAsync(c => c.Id == colocationId);
             string mode = colocation?.AssignmentMode ?? "Auto";
+
+            // Fetch members directly from DB to avoid Include issues
+            var members = await _context.Users
+                .Where(u => u.ColocationId == colocationId)
+                .ToListAsync();
+            
+            var memberIds = members.Select(m => m.Id).ToList();
 
             var templates = await _context.TaskTemplates
                 .Where(t => t.ColocationId == colocationId && t.IsActive && !t.IsPaused)
                 .ToListAsync();
 
-            var members = colocation?.Members.ToList() ?? new List<ApplicationUser>();
             var random = new Random();
             string todayKey = DateTime.Today.DayOfWeek.ToString(); // e.g. "Monday"
             int currentDayOfWeekNum = (int)DateTime.Today.DayOfWeek == 0 ? 7 : (int)DateTime.Today.DayOfWeek; // 1=Mon...7=Sun
@@ -147,9 +160,17 @@ namespace Bayti.Controllers
 
             // Fetch availabilities for today
             var availableUserIds = await _context.Availabilities
-                .Where(a => a.DayKey == todayKey && a.IsActive && members.Select(m => m.Id).Contains(a.UserId))
+                .Where(a => a.DayKey == todayKey && a.IsActive && memberIds.Contains(a.UserId))
                 .Select(a => a.UserId)
                 .ToListAsync();
+
+            int createdCount = 0;
+            int skippedCount = 0;
+            int alreadyExistsCount = 0;
+            int assignedCount = 0;
+
+            // Local count to track assignments during THIS loop (since SaveChanges is at the end)
+            var currentAssignments = memberIds.ToDictionary(id => (int?)id, id => 0);
 
             foreach (var t in templates)
             {
@@ -163,7 +184,8 @@ namespace Bayti.Controllers
                 else if (t.RecurrenceType == "Weekly" && !string.IsNullOrEmpty(t.WeeklyDays))
                 {
                     // WeeklyDays is typically saved as "1,3,5" where 1=Mon, 2=Tue...
-                    shouldGenerateToday = t.WeeklyDays.Contains(currentDayOfWeekNum.ToString());
+                    var days = t.WeeklyDays.Split(',', StringSplitOptions.RemoveEmptyEntries);
+                    shouldGenerateToday = days.Contains(currentDayOfWeekNum.ToString());
                 }
                 else if (t.RecurrenceType == "Monthly" && t.MonthlyDay.HasValue)
                 {
@@ -179,7 +201,11 @@ namespace Bayti.Controllers
                     shouldGenerateToday = (daysPassed >= 0 && daysPassed % t.CustomIntervalDays.Value == 0);
                 }
 
-                if (!shouldGenerateToday) continue; // Skip if not scheduled for today
+                if (!shouldGenerateToday) 
+                {
+                    skippedCount++;
+                    continue; 
+                }
 
                 // Check if already has an instance for today
                 var exists = await _context.TaskInstances
@@ -190,28 +216,26 @@ namespace Bayti.Controllers
                     int? assignedUserId = null;
                     if (mode == "Auto")
                     {
-                        // L'affectation se réalise ici : le système cherche le membre le moins occupé aujourd'hui
-                        var candidateIds = availableUserIds.Any() ? availableUserIds : members.Select(m => m.Id).ToList();
+                        var candidateIds = availableUserIds.Any() ? availableUserIds : memberIds;
                         
                         if (candidateIds.Any())
                         {
-                            // On compte combien de tâches chaque candidat a déjà aujourd'hui
-                            var counts = await _context.TaskInstances
+                            // Optimized selection: find users with the least tasks today (DB + Local)
+                            var dbTaskCounts = await _context.TaskInstances
                                 .Where(i => candidateIds.Contains(i.AssignedUserId ?? 0) && i.DueDate.Date == DateTime.Today)
                                 .GroupBy(i => i.AssignedUserId)
                                 .Select(g => new { UserId = g.Key, Count = g.Count() })
                                 .ToListAsync();
 
-                            // On trouve le minimum de tâches assignées
-                            int minTasks = counts.Any() && counts.Count == candidateIds.Count ? counts.Min(c => c.Count) : 0;
-                            
-                            // On filtre les candidats qui ont ce minimum (ceux qui n'ont rien sont à 0)
-                            var bestCandidates = candidateIds
-                                .Where(id => !counts.Any(c => c.UserId == id) || counts.First(c => c.UserId == id).Count == minTasks)
-                                .ToList();
+                            var totalCounts = candidateIds.ToDictionary(id => (int?)id, id => currentAssignments[id]);
+                            foreach (var tc in dbTaskCounts) { if (tc.UserId.HasValue) totalCounts[tc.UserId] += tc.Count; }
 
-                            // On en choisit un au hasard parmi les plus "libres"
+                            int minTasks = totalCounts.Values.Min();
+                            var bestCandidates = totalCounts.Where(d => d.Value == minTasks).Select(d => d.Key).ToList();
+
                             assignedUserId = bestCandidates[random.Next(bestCandidates.Count)];
+                            currentAssignments[assignedUserId]++;
+                            assignedCount++;
                         }
                     }
 
@@ -221,14 +245,77 @@ namespace Bayti.Controllers
                         AssignedUserId = assignedUserId,
                         DueDate = DateTime.Today.AddHours(20), // Due at 8pm
                         Status = "Pending",
-                        Comments = "", // Required by DB
+                        Comments = "", 
                         CreatedAt = DateTime.UtcNow
                     };
                     _context.TaskInstances.Add(instance);
+                    createdCount++;
+                }
+                else
+                {
+                    alreadyExistsCount++;
+                    
+                    // NEW: If task exists but is unassigned and we are in Auto mode, try to assign it now!
+                    if (mode == "Auto")
+                    {
+                        var existingTask = await _context.TaskInstances
+                            .FirstOrDefaultAsync(i => i.TaskTemplateId == t.Id && i.DueDate.Date == DateTime.Today && i.AssignedUserId == null);
+                            
+                        if (existingTask != null)
+                        {
+                            var candidateIds = availableUserIds.Any() ? availableUserIds : memberIds;
+                            if (candidateIds.Any())
+                            {
+                                // Selection for repair accounting for current assignments
+                                var totalCounts = candidateIds.ToDictionary(id => (int?)id, id => currentAssignments[id]);
+                                
+                                var dbTaskCounts = await _context.TaskInstances
+                                    .Where(i => candidateIds.Contains(i.AssignedUserId ?? 0) && i.DueDate.Date == DateTime.Today)
+                                    .GroupBy(i => i.AssignedUserId)
+                                    .Select(g => new { UserId = g.Key, Count = g.Count() })
+                                    .ToListAsync();
+
+                                foreach (var tc in dbTaskCounts) { if (tc.UserId.HasValue) totalCounts[tc.UserId] += tc.Count; }
+
+                                int minTasks = totalCounts.Values.Min();
+                                var bestCandidates = totalCounts.Where(d => d.Value == minTasks).Select(d => d.Key).ToList();
+
+                                existingTask.AssignedUserId = bestCandidates[random.Next(bestCandidates.Count)];
+                                currentAssignments[existingTask.AssignedUserId]++;
+                                assignedCount++;
+                                createdCount++;
+                            }
+                        }
+                    }
                 }
             }
 
-            await _context.SaveChangesAsync();
+            if (createdCount > 0)
+            {
+                await _context.SaveChangesAsync();
+                
+                if (mode == "Auto" && assignedCount < createdCount)
+                {
+                    TempData["WarningMessage"] = $"{createdCount} tâches générées, mais {createdCount - assignedCount} n'ont pas pu être assignées automatiquement (aucun membre disponible aujourd'hui).";
+                }
+                else
+                {
+                    TempData["SuccessMessage"] = $"{createdCount} tâche(s) générée(s) avec succès !";
+                }
+            }
+            else if (templates.Count == 0)
+            {
+                TempData["InfoMessage"] = "Aucune règle de tâche active trouvée pour cette colocation.";
+            }
+            else if (alreadyExistsCount > 0)
+            {
+                TempData["InfoMessage"] = "Toutes les tâches prévues pour aujourd'hui ont déjà été générées.";
+            }
+            else
+            {
+                TempData["InfoMessage"] = "Aucune tâche n'est planifiée pour aujourd'hui selon vos règles de récurrence.";
+            }
+
             return RedirectToAction(nameof(Index));
         }
 

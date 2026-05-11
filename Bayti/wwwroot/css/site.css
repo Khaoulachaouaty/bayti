@@ -56,8 +56,8 @@ a:hover { color: var(--coral-dark); }
 .bayti-app { 
     display: flex; 
     height: 100vh; 
-    padding: 16px; 
-    gap: 16px; 
+    padding: 24px; 
+    gap: 20px; 
     position: relative; 
     z-index: 1; 
 }
@@ -177,10 +177,11 @@ a:hover { color: var(--coral-dark); }
     border-radius: var(--r-xl);
     border: 1px solid var(--border);
     box-shadow: var(--shadow-sm);
+    padding: 12px; /* Base breathing room */
 }
 .bayti-main::-webkit-scrollbar { width: 5px; }
 .bayti-main::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 10px; }
-.page-wrap { max-width: var(--max-w); margin: 0 auto; padding: 36px 40px; }
+.page-wrap { max-width: var(--max-w); margin: 0 auto; padding: 48px 50px; }
 
 /* ── CARDS ────────────────────────────────────── */
 .card {

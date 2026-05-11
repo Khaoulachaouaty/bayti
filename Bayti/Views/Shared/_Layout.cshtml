@@ -84,18 +84,10 @@
                 <i class="fa-solid fa-calendar-days sb-link-icon"></i>
                 <span>Planning</span>
             </a>
-            @{
-                int unread = 0;
-                if (!string.IsNullOrEmpty(uid))
-                    unread = DbContext.Notifications.Count(n => n.UserId == int.Parse(uid) && !n.IsRead);
-            }
-            <a class="sb-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Notifications" ? "active" : "")"
-               asp-controller="Notifications" asp-action="Index">
-                <i class="fa-solid fa-bell sb-link-icon"></i>
-                <span>Notifications</span>
-                @if (unread > 0) {
-                    <span class="sb-badge">@unread</span>
-                }
+            <a class="sb-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Availabilities" ? "active" : "")"
+               asp-controller="Availabilities" asp-action="Index">
+                <i class="fa-solid fa-clock sb-link-icon"></i>
+                <span>Disponibilités</span>
             </a>
 
             <div class="sb-section-label" style="margin-top:8px;">Colocation</div>
@@ -162,6 +154,40 @@
     <main class="bayti-main">
         @RenderBody()
     </main>
+
+    <!-- ═══════════════ TOASTS ═══════════════ -->
+    <div id="toast-container">
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="toast-card">
+                <div class="toast-icon ibox-mint"><i class="fa-solid fa-circle-check"></i></div>
+                <div class="toast-content">
+                    <div class="toast-title">Succès</div>
+                    <div class="toast-msg">@TempData["SuccessMessage"]</div>
+                </div>
+            </div>
+        }
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <div class="toast-card">
+                <div class="toast-icon ibox-red"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                <div class="toast-content">
+                    <div class="toast-title">Erreur</div>
+                    <div class="toast-msg">@TempData["ErrorMessage"]</div>
+                </div>
+            </div>
+        }
+        @if (TempData["InfoMessage"] != null)
+        {
+            <div class="toast-card">
+                <div class="toast-icon ibox-blue"><i class="fa-solid fa-circle-info"></i></div>
+                <div class="toast-content">
+                    <div class="toast-title">Info</div>
+                    <div class="toast-msg">@TempData["InfoMessage"]</div>
+                </div>
+            </div>
+        }
+    </div>
 
 </div>
 
