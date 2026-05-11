@@ -107,6 +107,19 @@ namespace Bayti.Controllers
                     _context.PointHistory.Add(history);
                 }
 
+                // Add success notification
+                _context.Notifications.Add(new Notification
+                {
+                    UserId = userId,
+                    Title = "Mission accomplie ! 🏆",
+                    Message = $"Félicitations ! Vous avez terminé '{instance.TaskTemplate.Title}' et gagné {instance.PointsAwarded} points.",
+                    Type = "Success",
+                    ActionUrl = "/Tasks",
+                    RelatedEntityType = "TaskInstance",
+                    RelatedEntityId = instance.Id,
+                    CreatedAt = DateTime.UtcNow
+                });
+
                 await _context.SaveChangesAsync();
             }
 
