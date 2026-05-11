@@ -239,11 +239,18 @@ namespace Bayti.Controllers
                         }
                     }
 
+                    var dueDate = DateTime.Today;
+                    if (t.PreferredTime.HasValue) {
+                        dueDate = dueDate.Add(t.PreferredTime.Value);
+                    } else {
+                        dueDate = dueDate.AddHours(20); // Default fallback
+                    }
+
                     var instance = new TaskInstance
                     {
                         TaskTemplateId = t.Id,
                         AssignedUserId = assignedUserId,
-                        DueDate = DateTime.Today.AddHours(20), // Due at 8pm
+                        DueDate = dueDate,
                         Status = "Pending",
                         Comments = "", 
                         CreatedAt = DateTime.UtcNow
@@ -281,6 +288,12 @@ namespace Bayti.Controllers
                                 var bestCandidates = totalCounts.Where(d => d.Value == minTasks).Select(d => d.Key).ToList();
 
                                 existingTask.AssignedUserId = bestCandidates[random.Next(bestCandidates.Count)];
+                                
+                                // Also fix the time if it was the hardcoded 20:00 and template has a preferred time
+                                if (t.PreferredTime.HasValue) {
+                                    existingTask.DueDate = DateTime.Today.Add(t.PreferredTime.Value);
+                                }
+                                
                                 currentAssignments[existingTask.AssignedUserId]++;
                                 assignedCount++;
                                 createdCount++;

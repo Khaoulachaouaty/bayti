@@ -41,6 +41,9 @@ namespace Bayti.Models
         public DateTime? StartDate { get; set; }
         public DateTime? EndDate { get; set; }
 
+        // Heure préférée pour la tâche
+        public TimeSpan? PreferredTime { get; set; }
+
         // Mise en pause
         public bool IsPaused { get; set; } = false;
 
