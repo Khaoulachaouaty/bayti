@@ -136,7 +136,7 @@
                 var avSrc = av.StartsWith("http") ? av : Url.Content(av);
             }
             <a asp-controller="Account" asp-action="Profile" class="sb-user-card">
-                <img src="@avSrc" class="sb-user-av" alt="avatar" />
+                <img src="@avSrc?v=@DateTime.Now.Ticks" class="sb-user-av" alt="avatar" />
                 <div class="sb-user-info">
                     <span class="sb-user-name">@(User.Identity?.Name?.Split('@')[0] ?? "Utilisateur")</span>
                     <span class="sb-user-role">Membre de la tribu 🏠</span>

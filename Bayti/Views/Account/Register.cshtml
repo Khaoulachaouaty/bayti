@@ -124,7 +124,8 @@
         /* Avatar section */
         .av-section { margin: 20px 0 24px; }
         .av-label { display: block; font-size: 11px; font-weight: 800; color: #475569; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 12px; }
-        .av-grid { display: flex; gap: 12px; justify-content: center; }
+        .av-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; }
+        @@media (max-width: 480px) { .av-grid { grid-template-columns: repeat(4, 1fr); } }
         .av-opt {
             cursor: pointer; border-radius: 16px; border: 2.5px solid #E2E8F0;
             padding: 4px; transition: all 0.2s cubic-bezier(0.34,1.56,0.64,1);
@@ -243,19 +244,16 @@
                     <input type="hidden" asp-for="AvatarUrl" id="av-input" value="/images/avatars/avatar1.png" />
                     <div class="av-grid">
                         @{
-                            var avs = new[]{
-                                "/images/avatars/avatar1.png",
-                                "/images/avatars/avatar2.png",
-                                "/images/avatars/avatar3.png",
-                                "/images/avatars/avatar4.png",
-                                "/images/avatars/avatar5.png"
-                            };
+                            var avs = new List<string>();
+                            for(int i=1; i<=10; i++) {
+                                avs.Add($"/images/avatars/avatar{i}.png");
+                            }
                         }
                         @foreach (var url in avs)
                         {
                             var src = Url.Content(url);
                             <div class="av-opt @(url=="/images/avatars/avatar1.png" ? "active" : "")" onclick="pickAv('@url', this)">
-                                <img src="@src" alt="Avatar" />
+                                <img src="@src?v=@DateTime.Now.Ticks" alt="Avatar" />
                                 <div class="av-check"><i class="fa-solid fa-check"></i></div>
                             </div>
                         }
@@ -270,6 +268,7 @@
         </div>
     </div>
 
+    <!-- sélectionner un avatar en cliquant sur une image -->
     <script>
         function pickAv(url, el) {
             document.getElementById('av-input').value = url;

@@ -55,13 +55,16 @@ namespace Bayti.Controllers
                             new Claim("AvatarUrl", user.AvatarUrl ?? "/images/avatars/avatar1.png")
                         };
 
+                        // carte d'identité
                         var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
 
+                        // pour remember me
                         var authProperties = new AuthenticationProperties
                         {
                             IsPersistent = model.RememberMe
                         };
 
+                        // La personne qui possède la/les carte(s) d'identité
                         await HttpContext.SignInAsync(
                             CookieAuthenticationDefaults.AuthenticationScheme,
                             new ClaimsPrincipal(claimsIdentity),

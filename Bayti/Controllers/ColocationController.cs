@@ -18,6 +18,7 @@ namespace Bayti.Controllers
             _context = context;
         }
 
+        //vérifie si l'utilisateur appartient à une colocation
         public async Task<IActionResult> Index()
         {
             var userId = int.Parse(User.FindFirstValue("UserId"));
@@ -38,6 +39,7 @@ namespace Bayti.Controllers
         public IActionResult Setup()
         {
             var userId = int.Parse(User.FindFirstValue("UserId"));
+
             var user = _context.Users.Find(userId);
             if (user.ColocationId != null)
             {
@@ -67,11 +69,11 @@ namespace Bayti.Controllers
                 AssignmentMode = "Auto"
             };
 
-            _context.Colocations.Add(colocation);
-            await _context.SaveChangesAsync();
+            _context.Colocations.Add(colocation);  // Ajoute la colocation au DbSet
+            await _context.SaveChangesAsync();     
 
-            user.ColocationId = colocation.Id;
-            user.IsAdmin = true; // Le créateur est admin
+            user.ColocationId = colocation.Id;     // Lie l'utilisateur à la colocation
+            user.IsAdmin = true; 
             await _context.SaveChangesAsync();
 
             // Refresh cookie with ColocationId
@@ -89,7 +91,7 @@ namespace Bayti.Controllers
                 ModelState.AddModelError("", "Le code est requis.");
                 return View("Setup");
             }
-
+            // Recherche la colocation correspondante au code fourni
             var colocation = await _context.Colocations
                 .FirstOrDefaultAsync(c => c.JoinCode == code.ToUpper());
 
@@ -120,9 +122,6 @@ namespace Bayti.Controllers
 
             if (user.IsAdmin)
             {
-                // Si l'admin part, on pourrait soit supprimer la coloc, soit nommer un nouvel admin.
-                // Ici, on suit la règle : suppression en cascade si admin part (ou s'il le décide explicitement).
-                // Pour simplifier l'action "Quitter", on ne le permet pas à l'admin s'il est seul ou on lui demande de supprimer.
                 TempData["Error"] = "En tant qu'administrateur, vous devez supprimer la colocation pour la quitter.";
                 return RedirectToAction("Index");
             }
@@ -149,10 +148,8 @@ namespace Bayti.Controllers
 
             var colocation = await _context.Colocations.FindAsync(user.ColocationId);
             
-            // La suppression en cascade est gérée au niveau de la DB (Fluent API)
             _context.Colocations.Remove(colocation);
             
-            // On remet l'admin en visiteur
             user.ColocationId = null;
             user.IsAdmin = false;
             
@@ -175,15 +172,18 @@ namespace Bayti.Controllers
             }
 
             var colocation = await _context.Colocations.FindAsync(user.ColocationId);
+
             if (colocation != null && new[] { "Auto", "Manuel", "Participatif" }.Contains(assignmentMode))
             {
+            // Si le mode change et que le nouveau mode est "Manuel" ou "Participatif"
                 if (colocation.AssignmentMode != assignmentMode && (assignmentMode == "Manuel" || assignmentMode == "Participatif"))
                 {
+                    // Récupère toutes les tâches en attente de la colocation
                     var pendingTasks = await _context.TaskInstances
                         .Include(t => t.TaskTemplate)
                         .Where(t => t.TaskTemplate.ColocationId == colocation.Id && t.Status == "Pending")
                         .ToListAsync();
-
+                    // Désassigne toutes les tâches (AssignedUserId = null)
                     foreach (var task in pendingTasks)
                     {
                         task.AssignedUserId = null;
@@ -207,7 +207,6 @@ namespace Bayti.Controllers
 
         private async Task RefreshSignIn(ApplicationUser user)
         {
-            // Simple logic to re-sign in the user to update claims
             var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.Name, user.FullName),

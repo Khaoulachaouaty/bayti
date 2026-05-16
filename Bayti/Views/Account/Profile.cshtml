@@ -15,6 +15,7 @@
     }
 
     <form asp-action="Profile" method="post">
+        <!-- Affichage des erreurs de validation du modèle -->
         <div asp-validation-summary="ModelOnly" class="text-danger mb-4"></div>
         <input type="hidden" asp-for="AvatarUrl" id="avatar-input" />
 
@@ -30,7 +31,7 @@
                     </div>
                     <div class="profile-identity">
                         <div class="profile-avatar-wrapper">
-                            <img id="profile-preview" src="@Url.Content(Model.AvatarUrl ?? "/images/avatars/avatar1.png")" alt="Avatar" />
+                            <img id="profile-preview" src="@Url.Content(Model.AvatarUrl ?? "/images/avatars/avatar1.png")?v=@DateTime.Now.Ticks" alt="Avatar" />
                             <div class="avatar-edit-badge"><i class="fa-solid fa-camera"></i></div>
                         </div>
                         <h2 class="profile-name-display">@Model.FullName</h2>
@@ -51,18 +52,15 @@
                         <label class="form-label-premium text-center mb-4" style="display:block;">Changer d'avatar</label>
                         <div class="avatar-picker-grid">
                             @{
-                                var avatars = new List<string> { 
-                                    "/images/avatars/avatar1.png", 
-                                    "/images/avatars/avatar2.png", 
-                                    "/images/avatars/avatar3.png", 
-                                    "/images/avatars/avatar4.png", 
-                                    "/images/avatars/avatar5.png"
-                                };
+                                var avatars = new List<string>();
+                                for(int i=1; i<=10; i++) {
+                                    avatars.Add($"/images/avatars/avatar{i}.png");
+                                }
                             }
                             @foreach (var url in avatars) {
-                                var resolvedUrl = url.StartsWith("http") ? url : Url.Content(url);
+                                var resolvedUrl = Url.Content(url);
                                 <div class="avatar-item @(Model.AvatarUrl == url ? "is-active" : "")" onclick="selectAvatar('@resolvedUrl', this, '@url')">
-                                    <img src="@resolvedUrl" alt="Avatar" />
+                                    <img src="@resolvedUrl?v=@DateTime.Now.Ticks" alt="Avatar" />
                                     <div class="avatar-check"><i class="fa-solid fa-check"></i></div>
                                 </div>
                             }

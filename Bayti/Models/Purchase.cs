@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -32,6 +32,5 @@ namespace Bayti.Models
 
         public DateTime? JokerUsedAt { get; set; }
 
-        public string Status { get; set; } = "Completed";
     }
 }

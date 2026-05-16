@@ -1,3 +1,5 @@
+/*Ce fichier définit la structure et les règles de validation des données échangées entre 
+les formulaires et les contrôleurs.*/
 using System.ComponentModel.DataAnnotations;
 
 namespace Bayti.ViewModels
@@ -8,10 +10,17 @@ namespace Bayti.ViewModels
         [EmailAddress(ErrorMessage = "Format d'email invalide")]
         public string Email { get; set; }
 
+        // Attribut [DataType(DataType.Password)] : 
+        // - Dans le formulaire : masque les caractères (affiche des ●●●)
+        // - Dans la base : ne stocke pas en clair (géré séparément)
         [Required(ErrorMessage = "Le mot de passe est requis")]
         [DataType(DataType.Password)]
         public string Password { get; set; }
 
+        // -------------------- SE SOUVENIR DE MOI --------------------
+        // booléen : true si l'utilisateur coche la case
+        // Permet de garder la session active après fermeture du navigateur 
+        // La durée du cookie sera plus longue (ex: 7 jours au lieu de session)
         public bool RememberMe { get; set; }
     }
 

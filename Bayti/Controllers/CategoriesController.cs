@@ -87,7 +87,9 @@ namespace Bayti.Controllers
 
             if (ModelState.IsValid)
             {
+
                 var existing = await _context.Categories.AsNoTracking().FirstOrDefaultAsync(c => c.Id == category.Id);
+                // Vérifie si la catégorie existe dans la base de données
                 if (existing == null || existing.ColocationId != colocationId)
                 {
                     return NotFound();

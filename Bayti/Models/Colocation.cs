@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -25,10 +25,8 @@ namespace Bayti.Models
         [MaxLength(20)]
         public string AssignmentMode { get; set; } = "Auto";
 
-        // Options
+        // Options  activer ou désactiver les notifications
         public bool EnableNotifications { get; set; } = true;
-        public bool EnableEmailReminders { get; set; } = true;
-        public int LatePenaltyPoints { get; set; } = 0;
 
         // Navigation
         public virtual ICollection<ApplicationUser> Members { get; set; } = new List<ApplicationUser>();

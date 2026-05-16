@@ -1,8 +1,12 @@
+using Bayti.Data;
+using Bayti.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Bayti.Models;
-using Bayti.Data;
+using System;
+using System.Net;
 using System.Security.Claims;
+using System.Text;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Bayti.Controllers
 {
@@ -15,7 +19,7 @@ namespace Bayti.Controllers
             _context = context;
         }
 
-        // GET: Tasks
+
         public async Task<IActionResult> Index()
         {
             var userIdStr = User.FindFirstValue("UserId");
@@ -29,14 +33,13 @@ namespace Bayti.Controllers
             string mode = colocation?.AssignmentMode ?? "Auto";
             ViewBag.AssignmentMode = mode;
 
-            // Fetch tasks for today
             var today = DateTime.Today;
 
+            // CONSTRUCTION DE LA REQUÊTE SELON LE MODE (sans l'exécuter)
             IQueryable<TaskInstance> tasksQuery;
 
             if (mode == "Participatif")
             {
-                // Show ALL tasks for the colocation for TODAY only (including Completed ones for the progress bar)
                 tasksQuery = _context.TaskInstances
                     .Include(i => i.TaskTemplate)
                         .ThenInclude(t => t.Category)
@@ -46,7 +49,7 @@ namespace Bayti.Controllers
             }
             else
             {
-                // Auto or Manuel: show strictly tasks assigned to the current user for TODAY
+                //manuel/auto
                 tasksQuery = _context.TaskInstances
                     .Include(i => i.TaskTemplate)
                         .ThenInclude(t => t.Category)
@@ -76,6 +79,7 @@ namespace Bayti.Controllers
             if (string.IsNullOrEmpty(userIdStr)) return Unauthorized();
             int userId = int.Parse(userIdStr);
 
+            // cherche une tâche que l'utilisateur peut prendre en charge
             var instance = await _context.TaskInstances
                 .Include(i => i.TaskTemplate)
                 .FirstOrDefaultAsync(i => i.Id == id && (i.AssignedUserId == userId || i.AssignedUserId == null));
@@ -84,16 +88,16 @@ namespace Bayti.Controllers
             {
                 instance.Status = "Completed";
                 instance.CompletedAt = DateTime.UtcNow;
-                instance.ClaimedByUserId = userId; // In case it was unassigned
+                instance.ClaimedByUserId = userId;
                 instance.PointsAwarded = instance.TaskTemplate.Points;
 
-                // Award points to user
+               
                 var user = await _context.Users.FindAsync(userId);
                 if (user != null)
                 {
                     user.Points += instance.PointsAwarded ?? 0;
                     
-                    // Add to history
+                    
                     var history = new PointHistory
                     {
                         UserId = userId,
@@ -107,18 +111,9 @@ namespace Bayti.Controllers
                     _context.PointHistory.Add(history);
                 }
 
-                // Add success notification
-                _context.Notifications.Add(new Notification
-                {
-                    UserId = userId,
-                    Title = "Mission accomplie ! 🏆",
-                    Message = $"Félicitations ! Vous avez terminé '{instance.TaskTemplate.Title}' et gagné {instance.PointsAwarded} points.",
-                    Type = "Success",
-                    ActionUrl = "/Tasks",
-                    RelatedEntityType = "TaskInstance",
-                    RelatedEntityId = instance.Id,
-                    CreatedAt = DateTime.UtcNow
-                });
+                await NotifyUser(userId, "Mission accomplie ! 🏆", 
+                    $"Félicitations ! Vous avez terminé '{instance.TaskTemplate.Title}' et gagné {instance.PointsAwarded} points.", 
+                    "Success", instance.Id);
 
                 await _context.SaveChangesAsync();
             }
@@ -126,6 +121,8 @@ namespace Bayti.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+
+        // choisir une tache
         [HttpPost]
         public async Task<IActionResult> Claim(int id)
         {
@@ -133,6 +130,7 @@ namespace Bayti.Controllers
             if (string.IsNullOrEmpty(userIdStr)) return Unauthorized();
             int userId = int.Parse(userIdStr);
 
+            // cherche une tache non assigné
             var instance = await _context.TaskInstances
                 .FirstOrDefaultAsync(i => i.Id == id && i.AssignedUserId == null);
 
@@ -141,13 +139,18 @@ namespace Bayti.Controllers
                 instance.AssignedUserId = userId;
                 instance.ClaimedByUserId = userId;
                 instance.ClaimedAt = DateTime.UtcNow;
+
+                await NotifyUser(userId, "C'est noté ! 🧹", 
+                    $"Vous avez choisi la tâche '{instance.TaskTemplate.Title}'. Elle est maintenant dans votre liste.", 
+                    "Info", instance.Id);
+
                 await _context.SaveChangesAsync();
             }
 
             return RedirectToAction(nameof(Index));
         }
 
-        // Action to generate test tasks if none exist
+        // mode auto
         public async Task<IActionResult> GenerateTestTasks()
         {
             var colocationIdStr = User.FindFirstValue("ColocationId");
@@ -155,23 +158,24 @@ namespace Bayti.Controllers
             var colocation = await _context.Colocations.FirstOrDefaultAsync(c => c.Id == colocationId);
             string mode = colocation?.AssignmentMode ?? "Auto";
 
-            // Fetch members directly from DB to avoid Include issues
+            // Tous les membres de la colocation
             var members = await _context.Users
                 .Where(u => u.ColocationId == colocationId)
                 .ToListAsync();
             
             var memberIds = members.Select(m => m.Id).ToList();
 
+            // Tous les templates de tâches actifs
             var templates = await _context.TaskTemplates
                 .Where(t => t.ColocationId == colocationId && t.IsActive && !t.IsPaused)
                 .ToListAsync();
 
             var random = new Random();
-            string todayKey = DateTime.Today.DayOfWeek.ToString(); // e.g. "Monday"
+            string todayKey = DateTime.Today.DayOfWeek.ToString();  //"Monday", "Tuesday", etc.
             int currentDayOfWeekNum = (int)DateTime.Today.DayOfWeek == 0 ? 7 : (int)DateTime.Today.DayOfWeek; // 1=Mon...7=Sun
-            int currentDayOfMonth = DateTime.Today.Day;
+            int currentDayOfMonth = DateTime.Today.Day; // 1=Lundi...7=Dimanche
 
-            // Fetch availabilities for today
+            // membres dispo today
             var availableUserIds = await _context.Availabilities
                 .Where(a => a.DayKey == todayKey && a.IsActive && memberIds.Contains(a.UserId))
                 .Select(a => a.UserId)
@@ -182,65 +186,74 @@ namespace Bayti.Controllers
             int alreadyExistsCount = 0;
             int assignedCount = 0;
 
-            // Local count to track assignments during THIS loop (since SaveChanges is at the end)
+            //Suivi local du nombre de tâches par utilisateur 
             var currentAssignments = memberIds.ToDictionary(id => (int?)id, id => 0);
 
             foreach (var t in templates)
             {
-                // Check recurrence rules
+                // Vérification si la tache doit être généré aujourd'hui
                 bool shouldGenerateToday = false;
-                
+
+                //Si la tâche est quotidienne, elle doit être générée AUJOURD'HUI
                 if (t.RecurrenceType == "Daily")
                 {
                     shouldGenerateToday = true;
                 }
                 else if (t.RecurrenceType == "Weekly" && !string.IsNullOrEmpty(t.WeeklyDays))
                 {
-                    // WeeklyDays is typically saved as "1,3,5" where 1=Mon, 2=Tue...
+                    //Si la tâche est hebdomadaire, vérifie si le jour actuel fait partie des jours sélectionnés
                     var days = t.WeeklyDays.Split(',', StringSplitOptions.RemoveEmptyEntries);
                     shouldGenerateToday = days.Contains(currentDayOfWeekNum.ToString());
                 }
+                //Mensuel 
                 else if (t.RecurrenceType == "Monthly" && t.MonthlyDay.HasValue)
                 {
                     shouldGenerateToday = (t.MonthlyDay.Value == currentDayOfMonth);
                 }
+                //Unique 
                 else if (t.RecurrenceType == "Once" && t.SpecificDate.HasValue)
                 {
                     shouldGenerateToday = (t.SpecificDate.Value.Date == DateTime.Today);
                 }
+                //Personnalisé 
                 else if (t.RecurrenceType == "Custom" && t.CustomIntervalDays.HasValue && t.CustomIntervalDays.Value > 0 && t.StartDate.HasValue)
                 {
                     int daysPassed = (DateTime.Today - t.StartDate.Value.Date).Days;
                     shouldGenerateToday = (daysPassed >= 0 && daysPassed % t.CustomIntervalDays.Value == 0);
                 }
 
+                //Si la tâche ne doit PAS être générée aujourd'hui, on l'ignore et on passe à la tâche suivante
                 if (!shouldGenerateToday) 
                 {
                     skippedCount++;
                     continue; 
                 }
 
-                // Check if already has an instance for today
+                //Vérification si une instance existe déjà pour aujourd'hui
                 var exists = await _context.TaskInstances
                     .AnyAsync(i => i.TaskTemplateId == t.Id && i.DueDate.Date == DateTime.Today);
                 
                 if (!exists)
                 {
                     int? assignedUserId = null;
+                    //assignation automatique à l'utilisateur le plus disponible
                     if (mode == "Auto")
                     {
+                        /// Si des utilisateurs sont disponibles aujourd'hui 
                         var candidateIds = availableUserIds.Any() ? availableUserIds : memberIds;
                         
                         if (candidateIds.Any())
                         {
-                            // Optimized selection: find users with the least tasks today (DB + Local)
+                            //  COMPTER LES TÂCHES DE CHAQUE CANDIDAT AUJOURD'HUI
                             var dbTaskCounts = await _context.TaskInstances
                                 .Where(i => candidateIds.Contains(i.AssignedUserId ?? 0) && i.DueDate.Date == DateTime.Today)
                                 .GroupBy(i => i.AssignedUserId)
                                 .Select(g => new { UserId = g.Key, Count = g.Count() })
                                 .ToListAsync();
 
+                            //COMBINER AVEC LES TÂCHES DÉJÀ ASSIGNÉES DANS CETTE BOUCLE
                             var totalCounts = candidateIds.ToDictionary(id => (int?)id, id => currentAssignments[id]);
+                            // Ajoute les compteurs de la base aux compteurs locaux
                             foreach (var tc in dbTaskCounts) { if (tc.UserId.HasValue) totalCounts[tc.UserId] += tc.Count; }
 
                             int minTasks = totalCounts.Values.Min();
@@ -250,19 +263,12 @@ namespace Bayti.Controllers
                             currentAssignments[assignedUserId]++;
                             assignedCount++;
 
-                            // Send assignment notification
-                            _context.Notifications.Add(new Notification
-                            {
-                                UserId = assignedUserId.Value,
-                                Title = "Nouvelle mission ! ✨",
-                                Message = $"Une nouvelle tâche vous a été attribuée : {t.Title}.",
-                                Type = "Info",
-                                ActionUrl = "/Tasks",
-                                CreatedAt = DateTime.UtcNow
-                            });
+                            await NotifyUser(assignedUserId.Value, "Nouvelle mission ! ✨", 
+                                $"Une nouvelle tâche vous a été attribuée : {t.Title}.", "Info");
                         }
                     }
 
+                    //Définition de la date d'échéance (heure préférée ou 20h par défaut)
                     var dueDate = DateTime.Today;
                     if (t.PreferredTime.HasValue) {
                         dueDate = dueDate.Add(t.PreferredTime.Value);
@@ -276,7 +282,6 @@ namespace Bayti.Controllers
                         AssignedUserId = assignedUserId,
                         DueDate = dueDate,
                         Status = "Pending",
-                        Comments = "", 
                         CreatedAt = DateTime.UtcNow
                     };
                     _context.TaskInstances.Add(instance);
@@ -284,9 +289,9 @@ namespace Bayti.Controllers
                 }
                 else
                 {
+                    //Tâche existe mais non assignée(mode Auto)
                     alreadyExistsCount++;
                     
-                    // NEW: If task exists but is unassigned and we are in Auto mode, try to assign it now!
                     if (mode == "Auto")
                     {
                         var existingTask = await _context.TaskInstances
@@ -297,7 +302,6 @@ namespace Bayti.Controllers
                             var candidateIds = availableUserIds.Any() ? availableUserIds : memberIds;
                             if (candidateIds.Any())
                             {
-                                // Selection for repair accounting for current assignments
                                 var totalCounts = candidateIds.ToDictionary(id => (int?)id, id => currentAssignments[id]);
                                 
                                 var dbTaskCounts = await _context.TaskInstances
@@ -313,7 +317,6 @@ namespace Bayti.Controllers
 
                                 existingTask.AssignedUserId = bestCandidates[random.Next(bestCandidates.Count)];
                                 
-                                // Also fix the time if it was the hardcoded 20:00 and template has a preferred time
                                 if (t.PreferredTime.HasValue) {
                                     existingTask.DueDate = DateTime.Today.Add(t.PreferredTime.Value);
                                 }
@@ -322,22 +325,15 @@ namespace Bayti.Controllers
                                 assignedCount++;
                                 createdCount++;
 
-                                // Send assignment notification for repaired task
-                                _context.Notifications.Add(new Notification
-                                {
-                                    UserId = existingTask.AssignedUserId.Value,
-                                    Title = "Mission assignée ! 🧹",
-                                    Message = $"La tâche '{t.Title}' vous a été assignée.",
-                                    Type = "Info",
-                                    ActionUrl = "/Tasks",
-                                    CreatedAt = DateTime.UtcNow
-                                });
+                                await NotifyUser(existingTask.AssignedUserId.Value, "Mission assignée ! 🧹", 
+                                    $"La tâche '{t.Title}' vous a été assignée.", "Info");
                             }
                         }
                     }
                 }
             }
 
+            //MESSAGES DE CONFIRMATION
             if (createdCount > 0)
             {
                 await _context.SaveChangesAsync();
@@ -367,7 +363,8 @@ namespace Bayti.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        // GET: Tasks/Manage (For Admin Manuel Mode)
+        
+        // pour le mode manuel
         public async Task<IActionResult> Manage()
         {
             var userIdStr = User.FindFirstValue("UserId");
@@ -381,7 +378,8 @@ namespace Bayti.Controllers
 
             var colocation = await _context.Colocations.Include(c => c.Members).FirstOrDefaultAsync(c => c.Id == colocationId);
 
-            var tasks = await _context.TaskInstances
+           // CHARGEMENT DES TÂCHES DU JOUR et non terminé de tout les users 
+           var tasks = await _context.TaskInstances
                 .Include(i => i.TaskTemplate)
                     .ThenInclude(t => t.Category)
                 .Include(i => i.AssignedUser)
@@ -405,81 +403,27 @@ namespace Bayti.Controllers
                 instance.AssignedUserId = assignedUserId;
                 await _context.SaveChangesAsync();
 
-                // Send notification to the user if newly assigned
                 if (assignedUserId.HasValue)
                 {
-                    _context.Notifications.Add(new Notification
-                    {
-                        UserId = assignedUserId.Value,
-                        Title = "Nouvelle tâche assignée",
-                        Message = $"On vous a assigné la tâche : {instance.TaskTemplate.Title}. À faire pour le {instance.DueDate:dd/MM}.",
-                        Type = "Info",
-                        ActionUrl = "/Tasks",
-                        RelatedEntityType = "TaskInstance",
-                        RelatedEntityId = instance.Id,
-                        CreatedAt = DateTime.UtcNow
-                    });
-                    await _context.SaveChangesAsync();
+                    await NotifyUser(assignedUserId.Value, "Nouvelle tâche assignée", 
+                        $"On vous a assigné la tâche : {instance.TaskTemplate.Title}. À faire pour le {instance.DueDate:dd/MM}.", 
+                        "Info", instance.Id);
                 }
             }
 
             return RedirectToAction(nameof(Manage));
         }
 
-        // Action to send reminders for pending tasks
-        [HttpPost]
-        public async Task<IActionResult> SendReminders()
-        {
-            var colocationIdStr = User.FindFirstValue("ColocationId");
-            int colocationId = int.Parse(colocationIdStr);
-            var isAdmin = User.FindFirstValue("IsAdmin") == "True";
-
-            if (!isAdmin) return Forbid();
-
-            var pendingTasks = await _context.TaskInstances
-                .Include(t => t.TaskTemplate)
-                .Where(t => t.TaskTemplate.ColocationId == colocationId && 
-                            t.Status == "Pending" && 
-                            t.AssignedUserId != null &&
-                            t.DueDate.Date >= DateTime.Today)
-                .ToListAsync();
-
-            int notifsSent = 0;
-            foreach (var task in pendingTasks)
-            {
-                _context.Notifications.Add(new Notification
-                {
-                    UserId = task.AssignedUserId.Value,
-                    Title = "Rappel de tâche 🔔",
-                    Message = $"N'oubliez pas de terminer : {task.TaskTemplate.Title}. L'échéance approche !",
-                    Type = "Warning",
-                    ActionUrl = "/Tasks",
-                    RelatedEntityType = "TaskInstance",
-                    RelatedEntityId = task.Id,
-                    CreatedAt = DateTime.UtcNow
-                });
-                notifsSent++;
-            }
-
-            if (notifsSent > 0)
-            {
-                await _context.SaveChangesAsync();
-                TempData["SuccessMessage"] = $"{notifsSent} rappel(s) envoyé(s) avec succès !";
-            }
-
-            return RedirectToAction(nameof(Index));
-        }
-
-        // Action to process overdue tasks and apply penalties (Simulates a midnight cron job)
+        // traiter les tâches en retard et à appliquer des pénalités
         [HttpPost]
         public async Task<IActionResult> ProcessOverdueTasks()
         {
             var colocationIdStr = User.FindFirstValue("ColocationId");
             int colocationId = int.Parse(colocationIdStr);
-            var colocation = await _context.Colocations.FindAsync(colocationId);
             
-            int penalty = colocation?.LatePenaltyPoints ?? 0;
+            // Find tasks that are past their due date and not completed
 
+            
             // Find tasks that are past their due date and not completed
             var overdueTasks = await _context.TaskInstances
                 .Include(t => t.TaskTemplate)
@@ -492,20 +436,22 @@ namespace Bayti.Controllers
             {
                 task.Status = "Failed";
 
-                // Penalize if the task was assigned to someone (or claimed but not finished)
-                if (task.AssignedUserId.HasValue && penalty > 0)
+                // Penalty is equal to the points the user WOULD HAVE gained
+                int taskPenalty = task.TaskTemplate.Points;
+
+                if (task.AssignedUserId.HasValue && taskPenalty > 0)
                 {
                     var user = await _context.Users.FindAsync(task.AssignedUserId.Value);
                     if (user != null)
                     {
-                        user.Points -= penalty;
+                        user.Points -= taskPenalty;
 
                         var history = new PointHistory
                         {
                             UserId = user.Id,
-                            PointsChange = -penalty,
+                            PointsChange = -taskPenalty,
                             PointsBalanceAfter = user.Points,
-                            Reason = $"Tâche non réalisée : {task.TaskTemplate.Title}",
+                            Reason = $"Tâche non réalisée (Pénalité) : {task.TaskTemplate.Title}",
                             Type = "Penalty",
                             TaskInstanceId = task.Id,
                             CreatedAt = DateTime.UtcNow
@@ -517,6 +463,21 @@ namespace Bayti.Controllers
 
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
+        }
+
+        private async Task NotifyUser(int userId, string title, string message, string type = "Info", int? relatedId = null)
+        {
+            _context.Notifications.Add(new Notification
+            {
+                UserId = userId,
+                Title = title,
+                Message = message,
+                Type = type,
+                ActionUrl = "/Tasks",
+                RelatedEntityType = relatedId.HasValue ? "TaskInstance" : "General",
+                RelatedEntityId = relatedId,
+                CreatedAt = DateTime.Now
+            });
         }
     }
 }

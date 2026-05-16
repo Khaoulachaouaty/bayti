@@ -31,14 +31,6 @@ namespace Bayti.Models
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
-        public DateTime? AssignedAt { get; set; }
-
-        public int? AssignedByUserId { get; set; }
-
-        [ForeignKey("AssignedByUserId")]
-        public virtual ApplicationUser AssignedBy { get; set; }
-
-        public string? Comments { get; set; }
 
         public int? PointsAwarded { get; set; }
 
@@ -51,5 +43,8 @@ namespace Bayti.Models
         public DateTime? ClaimedAt { get; set; }
 
         public DateTime? LastReminderSent { get; set; }
+
+        [MaxLength(200)]
+        public string Comments { get; set; } = "";
     }
 }

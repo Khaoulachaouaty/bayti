@@ -37,9 +37,8 @@ namespace Bayti.Models
         // Date spécifique pour tâches ponctuelles
         public DateTime? SpecificDate { get; set; }
 
-        // Date de début et fin
+        // Date de début
         public DateTime? StartDate { get; set; }
-        public DateTime? EndDate { get; set; }
 
         // Heure préférée pour la tâche
         public TimeSpan? PreferredTime { get; set; }
@@ -47,10 +46,10 @@ namespace Bayti.Models
         // Mise en pause
         public bool IsPaused { get; set; } = false;
 
-        public DateTime? LastGeneratedDate { get; set; }
 
         public int Points { get; set; } = 10;
-
+        
+        //Au lieux de suppression
         public bool IsActive { get; set; } = true;
 
         [Required]
@@ -66,13 +65,6 @@ namespace Bayti.Models
         public virtual Colocation Colocation { get; set; }
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-
-        public int? CreatedByUserId { get; set; }
-
-        [ForeignKey("CreatedByUserId")]
-        public virtual ApplicationUser CreatedBy { get; set; }
-
-        public int? EstimatedDuration { get; set; }
 
         public virtual ICollection<TaskInstance> Instances { get; set; } = new List<TaskInstance>();
     }

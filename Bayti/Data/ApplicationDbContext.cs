@@ -74,11 +74,6 @@ namespace Bayti.Data
                     .HasForeignKey(ti => ti.AssignedUserId)
                     .OnDelete(DeleteBehavior.SetNull);
 
-                // Relation avec AssignedBy (l'admin qui a assigné) - NO ACTION pour éviter cascade multiple
-                entity.HasOne(ti => ti.AssignedBy)
-                    .WithMany()
-                    .HasForeignKey(ti => ti.AssignedByUserId)
-                    .OnDelete(DeleteBehavior.NoAction);
 
                 // Relation avec ClaimedBy (qui a pris la tâche) - NO ACTION pour éviter cascade multiple
                 entity.HasOne(ti => ti.ClaimedBy)

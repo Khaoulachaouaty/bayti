@@ -18,7 +18,6 @@ namespace Bayti.Controllers
             _context = context;
         }
 
-        // GET: Rewards (Boutique)
         public async Task<IActionResult> Index()
         {
             var colocationIdStr = User.FindFirstValue("ColocationId");
@@ -32,15 +31,15 @@ namespace Bayti.Controllers
 
             var isAdmin = User.FindFirstValue("IsAdmin") == "True";
 
-            // Auto-generate defaults if empty and user is admin
+
             if (!rewards.Any() && isAdmin)
             {
                 var defaults = new List<Reward>
                 {
-                    new Reward { Name = "Carte Joker", Description = "Évitez une corvée de votre choix sans perdre de points !", Emoji = "🃏", IconClass = "", Price = 150, IsJoker = true, ColocationId = colocationId, CreatedAt = DateTime.UtcNow },
-                    new Reward { Name = "Choix du Film", Description = "Vous avez le pouvoir absolu sur la TV ce soir.", Emoji = "🍿", IconClass = "", Price = 50, IsJoker = false, ColocationId = colocationId, CreatedAt = DateTime.UtcNow },
-                    new Reward { Name = "Grâce Matinée", Description = "Quelqu'un d'autre prépare le petit-déjeuner demain matin.", Emoji = "🥐", IconClass = "", Price = 100, IsJoker = false, ColocationId = colocationId, CreatedAt = DateTime.UtcNow },
-                    new Reward { Name = "Pizza payée !", Description = "L'admin (ou la cagnotte) vous offre une pizza.", Emoji = "🍕", IconClass = "", Price = 300, IsJoker = false, ColocationId = colocationId, CreatedAt = DateTime.UtcNow }
+                    new Reward { Name = "Carte Joker", Description = "Évitez une corvée de votre choix sans perdre de points !", Emoji = "🃏", Price = 150, IsJoker = true, ColocationId = colocationId, CreatedAt = DateTime.UtcNow },
+                    new Reward { Name = "Choix du Film", Description = "Vous avez le pouvoir absolu sur la TV ce soir.", Emoji = "🍿", Price = 50, IsJoker = false, ColocationId = colocationId, CreatedAt = DateTime.UtcNow },
+                    new Reward { Name = "Grâce Matinée", Description = "Quelqu'un d'autre prépare le petit-déjeuner demain matin.", Emoji = "🥐", Price = 100, IsJoker = false, ColocationId = colocationId, CreatedAt = DateTime.UtcNow },
+                    new Reward { Name = "Pizza payée !", Description = "L'admin (ou la cagnotte) vous offre une pizza.", Emoji = "🍕", Price = 300, IsJoker = false, ColocationId = colocationId, CreatedAt = DateTime.UtcNow }
                 };
                 
                 _context.Rewards.AddRange(defaults);
@@ -68,10 +67,8 @@ namespace Bayti.Controllers
 
             if (reward != null && user != null && user.Points >= reward.Price)
             {
-                // Deduct points
                 user.Points -= reward.Price;
 
-                // Record purchase
                 var purchase = new Purchase
                 {
                     UserId = userId,
@@ -81,7 +78,6 @@ namespace Bayti.Controllers
                 };
                 _context.Purchases.Add(purchase);
 
-                // Record in history
                 var history = new PointHistory
                 {
                     UserId = userId,
@@ -104,7 +100,6 @@ namespace Bayti.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        // GET: Rewards/Create
         public IActionResult Create()
         {
             var isAdmin = User.FindFirstValue("IsAdmin") == "True";
@@ -125,18 +120,13 @@ namespace Bayti.Controllers
             var userIdStr = User.FindFirstValue("UserId");
 
             model.ColocationId = colocationId;
-            model.CreatedByUserId = int.Parse(userIdStr);
             model.CreatedAt = DateTime.UtcNow;
             
-            // Handle nulls for form submission
             model.Description ??= "";
             model.Emoji ??= "🎁";
-            model.IconClass ??= "";
 
             ModelState.Remove("ColocationId");
-            ModelState.Remove("CreatedByUserId");
             ModelState.Remove("Colocation");
-            ModelState.Remove("CreatedBy");
             ModelState.Remove("Purchases");
 
             if (ModelState.IsValid)
@@ -148,7 +138,6 @@ namespace Bayti.Controllers
             return View(model);
         }
 
-        // GET: Rewards/Edit/5
         public async Task<IActionResult> Edit(int id)
         {
             var isAdmin = User.FindFirstValue("IsAdmin") == "True";
@@ -209,7 +198,6 @@ namespace Bayti.Controllers
 
             if (reward != null)
             {
-                // Soft delete by setting IsActive to false
                 reward.IsActive = false;
                 await _context.SaveChangesAsync();
                 TempData["SuccessMessage"] = "Récompense supprimée avec succès.";

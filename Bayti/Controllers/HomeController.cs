@@ -31,7 +31,6 @@ public class HomeController : Controller
         var colocationId = int.Parse(colocationIdStr);
         var userId = int.Parse(User.FindFirstValue("UserId"));
 
-        // Données pour le Dashboard
         var dashboard = new DashboardViewModel
         {
             Colocation = await _context.Colocations
@@ -44,35 +43,24 @@ public class HomeController : Controller
                 .Where(t => t.AssignedUserId == userId && t.Status == "Pending")
                 .OrderBy(t => t.DueDate)
                 .ToListAsync(),
-            
-            RecentNotifications = await _context.Notifications
-                .Where(n => n.UserId == userId)
-                .OrderByDescending(n => n.CreatedAt)
-                .Take(5)
-                .ToListAsync(),
-
+            // Activité récente (5 dernières tâches complétées dans la colocation)
             ColocationTasks = await _context.TaskInstances
                 .Include(t => t.TaskTemplate)
                 .Include(t => t.AssignedUser)
-                .Where(t => t.TaskTemplate.ColocationId == colocationId && t.Status == "Pending" && t.AssignedUserId != userId)
-                .OrderBy(t => t.DueDate)
+                .Where(t => t.TaskTemplate.ColocationId == colocationId && t.Status == "Completed")
+                .OrderByDescending(t => t.CompletedAt)
                 .Take(5)
-                .ToListAsync(),
-
-            RecentPurchases = await _context.Purchases
-                .Include(p => p.User)
-                .Include(p => p.Reward)
-                .Where(p => p.Reward.ColocationId == colocationId)
-                .OrderByDescending(p => p.PurchasedAt)
-                .Take(4)
                 .ToListAsync()
         };
         
         var today = DateTime.Today;
+
+        // Toutes les tâches de l'utilisateur pour aujourd'hui
         var allMyTasksToday = await _context.TaskInstances
             .Where(t => t.AssignedUserId == userId && t.DueDate.Date == today)
             .ToListAsync();
             
+        // Nombre total de tâches pour aujourd'hui
         dashboard.TotalTasksToday = allMyTasksToday.Count;
         dashboard.CompletedTasksToday = allMyTasksToday.Count(t => t.Status == "Completed");
         
@@ -87,6 +75,7 @@ public class HomeController : Controller
         return View();
     }
 
+    // Action qui affiche la page d'erreur générique
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     public IActionResult Error()
     {
@@ -94,14 +83,13 @@ public class HomeController : Controller
     }
 }
 
+// Regroupe toutes les données nécessaires à l'affichage du tableau de bord
 public class DashboardViewModel
 {
     public Colocation Colocation { get; set; }
     public List<TaskInstance> MyPendingTasks { get; set; }
-    public List<Notification> RecentNotifications { get; set; }
     public int UserPoints { get; set; }
     public int TotalTasksToday { get; set; }
     public int CompletedTasksToday { get; set; }
     public List<TaskInstance> ColocationTasks { get; set; }
-    public List<Purchase> RecentPurchases { get; set; }
 }

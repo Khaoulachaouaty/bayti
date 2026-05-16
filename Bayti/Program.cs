@@ -4,39 +4,53 @@ using Bayti.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// --- CONFIGURATION DES SERVICES (Conteneur de Dépendances) ---
+
+// Ajoute le support des Contrôleurs avec Vues (système MVC)
 builder.Services.AddControllersWithViews();
 
-// Add DbContext
+// Configure la connexion à la base de données SQL Server via la chaîne de connexion "DefaultConnection"
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// Add Authentication
+// Configure l'authentification basée sur les cookies
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {
-        options.LoginPath = "/Account/Login";
-        options.LogoutPath = "/Account/Logout";
-        options.ExpireTimeSpan = TimeSpan.FromDays(7);
-        options.SlidingExpiration = true;
+        options.LoginPath = "/Account/Login";       // Page vers laquelle rediriger si non connecté
+        options.LogoutPath = "/Account/Logout";     // Route de déconnexion
+        options.ExpireTimeSpan = TimeSpan.FromDays(7); // Durée de session (7 jours)
+        options.SlidingExpiration = true;           // Prolonge la session à chaque interaction
     });
 
+// Enregistre le service de rappel (Background Service) qui tourne en arrière-plan
 builder.Services.AddHostedService<Bayti.Services.TaskReminderService>();
 
+// Construction de l'application
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// --- CONFIGURATION DU PIPELINE DE REQUÊTE (Middlewares) ---
+
+// Gestion des exceptions en mode Production
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
     app.UseHsts();
 }
 
+// Redirection automatique vers HTTPS
 app.UseHttpsRedirection();
+
+// Accès aux fichiers statiques (Images, CSS, JavaScript)
 app.UseStaticFiles();
+
+// Système de routage (analyse des URLs)
 app.UseRouting();
 
+// Middleware d'Authentification (vérifie qui est l'utilisateur via le cookie)
 app.UseAuthentication();
+
+// Middleware d'Autorisation (vérifie les permissions de l'utilisateur)
 app.UseAuthorization();
 
 app.MapControllerRoute(

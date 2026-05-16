@@ -42,6 +42,7 @@ namespace Bayti.Controllers
 
             int colocationId = int.Parse(colocationIdStr);
 
+            // PRÉPARATION DE LA LISTE DÉROULANTE DES CATÉGORIES
             ViewBag.Categories = new SelectList(await _context.Categories
                 .Where(c => c.ColocationId == colocationId)
                 .ToListAsync(), "Id", "Name");
@@ -62,19 +63,14 @@ namespace Bayti.Controllers
 
             int colocationId = int.Parse(colocationIdStr);
             model.ColocationId = colocationId;
-            model.CreatedByUserId = !string.IsNullOrEmpty(userIdStr) ? int.Parse(userIdStr) : null;
             model.CreatedAt = DateTime.UtcNow;
 
-            // Database doesn't allow NULLs for these columns even if model says string?
             model.WeeklyDays ??= "";
             model.Description ??= "";
 
-            // Remove server-side and navigation properties from validation
             ModelState.Remove("ColocationId");
-            ModelState.Remove("CreatedByUserId");
             ModelState.Remove("Colocation");
             ModelState.Remove("Category");
-            ModelState.Remove("CreatedBy");
 
             if (model.RecurrenceType != "Weekly") ModelState.Remove("WeeklyDays");
 
@@ -129,7 +125,7 @@ namespace Bayti.Controllers
             var colocationIdStr = User.FindFirstValue("ColocationId");
             int colocationId = int.Parse(colocationIdStr);
 
-            // Remove server-side fields from validation
+            
             ModelState.Remove("ColocationId");
             ModelState.Remove("CreatedByUserId");
             ModelState.Remove("Colocation");
@@ -147,11 +143,11 @@ namespace Bayti.Controllers
                     await _context.SaveChangesAsync();
                     return RedirectToAction(nameof(Index));
                 }
-                catch (DbUpdateConcurrencyException)
+                /*catch (DbUpdateConcurrencyException)
                 {
                     if (!TaskExists(model.Id)) return NotFound();
                     else throw;
-                }
+                }*/
                 catch (Exception ex)
                 {
                     var msg = ex.Message;
@@ -179,7 +175,7 @@ namespace Bayti.Controllers
             var task = await _context.TaskTemplates.FirstOrDefaultAsync(t => t.Id == id && t.ColocationId == colocationId);
             if (task != null)
             {
-                task.IsActive = false; // Soft delete
+                task.IsActive = false;
                 await _context.SaveChangesAsync();
             }
             return RedirectToAction(nameof(Index));
